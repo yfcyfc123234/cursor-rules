@@ -1,0 +1,98 @@
+---
+alwaysApply: true
+---
+
+# Android 项目规则
+
+> 适用于纯 Android 原生项目
+
+## 项目类型
+- **项目类型**：Android 原生项目
+- **主要语言**：Kotlin 优先，Java 按需使用
+
+## 代码风格
+
+### 命名规范
+- **类名**：PascalCase（如 `UserRepository`、`MainActivity`）
+- **方法/变量**：camelCase（如 `fetchUserData()`、`userName`）
+- **常量**：UPPER_SNAKE_CASE（如 `MAX_RETRY_COUNT`）
+- **包名**：小写，使用反向域名（如 `com.example.app`）
+
+### UI 布局
+- 主要使用 XML 布局文件
+- 布局文件命名：`activity_xxx.xml`、`fragment_xxx.xml`、`item_xxx.xml`
+- 使用 ViewBinding 或 DataBinding 进行视图绑定
+
+### 架构模式
+- **架构**：简单 MVC 模式即可
+- 业务逻辑简单，不需要过度设计
+- Activity/Fragment 作为 View 层
+- Repository 处理数据逻辑
+- Model 使用 Data Class（Kotlin）或 POJO（Java）
+
+### 异步处理
+- 优先使用 Kotlin 协程
+- RxJava 作为备选，根据场景选择
+- 避免在主线程执行耗时操作
+
+## 依赖管理
+
+### 常用库
+- **网络请求**：Retrofit + OkHttp
+- **图片加载**：Glide
+- **依赖注入**：按项目需要选择（如 Hilt、Koin）
+- **数据库**：Room（如需数据库）
+
+### 版本管理
+- 使用 Version Catalog 或 buildSrc 管理依赖版本
+- 保持依赖版本统一
+
+## 代码组织
+
+### 包结构
+```
+com.example.app/
+├── activity/          # Activity
+├── fragment/          # Fragment
+├── adapter/           # RecyclerView Adapter
+├── model/             # 数据模型
+├── repository/        # 数据仓库
+├── utils/             # 工具类
+├── network/           # 网络相关
+└── base/              # 基类
+```
+
+### 文件组织
+- 一个类一个文件
+- 相关功能放在同一包下
+- 工具类使用 object 单例（Kotlin）或静态方法（Java）
+
+## 错误处理
+
+### 异常处理
+- 使用 try-catch 处理关键操作
+- 记录关键错误的日志
+- 给用户友好的错误提示
+
+### 日志记录
+- 关键操作记录日志
+- 使用合适的日志级别（DEBUG、INFO、WARN、ERROR）
+
+## Git 工作流
+
+### 文件管理
+- 新创建的文件自动添加到 Git
+- 修改的文件自动添加到 Git
+- 跳过 build/ 目录和 .gitignore 中的文件
+
+## 其他规范
+
+### 资源文件
+- 字符串资源使用 `strings.xml`，避免硬编码
+- 颜色、尺寸等使用资源文件
+- 国际化暂时不需要，但预留空间
+
+### 性能优化
+- 避免过度优化，保持代码可维护性
+- 注意内存泄漏（特别是生命周期相关的对象）
+- 合理使用图片资源（压缩、适配不同密度）

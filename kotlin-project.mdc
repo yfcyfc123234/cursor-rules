@@ -1,0 +1,100 @@
+---
+alwaysApply: true
+---
+
+# Kotlin 项目规则
+
+> 适用于纯 Kotlin 项目（非 Android）
+
+## 项目类型
+- **项目类型**：Kotlin 项目
+- **主要用途**：Kotlin 后端、工具、库开发等
+
+## 代码风格
+
+### 命名规范
+- **类名**：PascalCase（如 `UserRepository`、`DataProcessor`）
+- **方法/变量**：camelCase（如 `fetchUserData()`、`userName`）
+- **常量**：UPPER_SNAKE_CASE（如 `MAX_RETRY_COUNT`）
+- **包名**：小写，使用反向域名
+
+### Kotlin 特性
+- 优先使用 Kotlin 现代特性
+- 使用 Data Class 替代 POJO
+- 使用扩展函数增强功能
+- 使用 Sealed Class 处理有限状态
+- 使用 null safety 特性
+
+## 架构模式
+
+### 简单项目
+- 根据项目需要选择合适的架构
+- 业务逻辑简单，不需要过度设计
+- 保持代码简洁、易读
+
+### 复杂项目
+- 可以考虑 MVC、MVVM 等架构模式
+- 业务逻辑与 UI 分离
+- 使用依赖注入（如 Koin、Kodein）
+
+## 异步处理
+
+### 协程
+- 优先使用 Kotlin 协程处理异步操作
+- 使用 suspend 函数
+- 合理使用 CoroutineScope
+- 注意协程的生命周期管理
+
+## 错误处理
+
+### 异常处理
+- 使用 try-catch 处理异常
+- 可以尝试 Result 封装（根据场景选择）
+- 提供有意义的错误信息
+
+### 日志记录
+- 关键操作记录日志
+- 使用合适的日志库（如 slf4j）
+- 使用合适的日志级别
+
+## 代码组织
+
+### 包结构
+```
+com.example.project/
+├── model/            # 数据模型
+├── service/          # 业务逻辑
+├── repository/       # 数据仓库
+├── utils/            # 工具类
+└── main.kt           # 入口文件
+```
+
+### 文件组织
+- 一个类一个文件
+- 相关功能放在同一包下
+- 使用 object 单例模式
+
+## 依赖管理
+
+### 构建工具
+- 使用 Gradle 或 Maven
+- 版本号统一管理
+- 注意依赖冲突
+
+## Git 工作流
+
+### 文件管理
+- 新创建的文件自动添加到 Git
+- 修改的文件自动添加到 Git
+- 跳过 build/ 目录和 .gitignore 中的文件
+
+## 其他规范
+
+### 性能优化
+- 避免过度优化，保持代码可维护性
+- 注意内存使用
+- 合理使用集合类型
+
+### 文档
+- 关键函数和类添加 KDoc 注释
+- 使用标准 KDoc 格式

@@ -1,0 +1,150 @@
+---
+alwaysApply: true
+---
+
+# Android + Flutter 混合项目规则
+
+> 适用于 Android + Flutter 混合开发项目
+
+## 项目类型
+- **项目类型**：Android + Flutter 混合项目
+- **主要技术栈**：Flutter 为主，Android 原生为辅
+- **开发方向**：Flutter 为主要开发方向
+
+## 代码风格
+
+### Flutter 部分（Dart）
+- **类名**：PascalCase（如 `UserRepository`、`HomePage`）
+- **方法/变量**：camelCase（如 `fetchUserData()`、`userName`）
+- **私有成员**：以下划线开头（如 `_privateMethod()`）
+- 使用响应式布局（MediaQuery、LayoutBuilder）
+- 使用相对单位（dp 逻辑像素）
+
+### Android 部分（Kotlin/Java）
+- **类名**：PascalCase（如 `MainActivity`、`PlatformChannelHandler`）
+- **方法/变量**：camelCase（如 `handleMethodCall()`、`result`）
+- **常量**：UPPER_SNAKE_CASE
+- 主要使用 Kotlin，Java 按需使用
+
+## 架构模式
+
+### Flutter 层
+- 使用状态管理方案（Provider、Riverpod、GetX 等）
+- 业务逻辑与 UI 分离
+- 使用 Repository 模式处理数据层
+
+### Android 原生层
+- 简单 MVC 模式即可
+- 主要用于 Platform Channel 交互
+- 处理原生功能（相机、文件系统、系统服务等）
+
+### 混合交互
+- Platform Channel 作为 Flutter 与 Android 的桥梁
+- 确保两端接口设计清晰
+- Platform Channel 调用必须包含错误处理
+- 参数和返回值类型要匹配
+
+## Platform Channel
+
+### 接口设计
+- Method Channel 用于方法调用
+- Event Channel 用于事件流
+- 方法命名清晰（如 `getDeviceInfo`、`saveFile`）
+- 参数使用 Map 或标准数据类型
+
+### 错误处理
+- Android 端必须处理异常并返回给 Flutter
+- Flutter 端需要处理可能的方法调用失败
+- 提供友好的错误信息
+
+### 版本兼容
+- Platform Channel 的 Android 代码需要版本兼容
+- 考虑不同 Android 版本的 API 差异
+- 测试不同版本的兼容性
+
+## 依赖管理
+
+### Flutter 依赖
+- 在 `pubspec.yaml` 中管理
+- 版本号使用精确版本或版本范围
+- 注意第三方插件的兼容性
+
+### Android 依赖
+- 在 `android/app/build.gradle` 或 `build.gradle` 中管理
+- 使用 Version Catalog 或 buildSrc 管理版本
+- 注意与 Flutter 插件的依赖冲突
+
+## 代码组织
+
+### Flutter 目录结构
+```
+lib/
+├── main.dart
+├── models/
+├── views/
+├── widgets/
+├── services/
+├── repositories/
+└── utils/
+```
+
+### Android 目录结构
+```
+android/app/src/main/
+├── kotlin/.../android/
+│   └── MainActivity.kt       # 主入口
+├── kotlin/.../platform/
+│   └── PlatformChannel.kt    # Platform Channel 处理
+└── res/
+```
+
+## 适配与兼容
+
+### Flutter 适配
+- 使用响应式布局
+- 考虑不同屏幕尺寸
+- 使用 MediaQuery 获取屏幕信息
+
+### Android 适配
+- 考虑不同 Android 版本
+- 注意权限申请（Android 6.0+）
+- 适配不同屏幕密度
+
+### 版本兼容
+- Flutter SDK 版本统一管理
+- Platform Channel 的 Android/iOS 原生代码需要版本兼容
+- 第三方插件的最低版本要求
+
+## 错误处理
+
+### Flutter 层
+- 使用 try-catch 处理异常
+- Platform Channel 调用必须有错误处理
+
+### Android 层
+- 使用 try-catch 处理关键操作
+- Platform Channel 方法必须捕获异常并返回给 Flutter
+
+## Git 工作流
+
+### 文件管理
+- 新创建的文件自动添加到 Git
+- 修改的文件自动添加到 Git
+- 跳过 build/ 目录、.gradle 目录和 .gitignore 中的文件
+
+## 其他规范
+
+### 国际化
+- Flutter 部分使用 intl 包（如需要）
+- 字符串使用资源文件，避免硬编码
+
+### 性能优化
+- 避免过度优化，保持代码可维护性
+- 注意 Flutter Widget 重建性能
+- 注意 Platform Channel 调用的性能影响
+- 合理使用图片资源
+
+### 调试
+- Flutter 端使用 Flutter DevTools
+- Android 端使用 Android Studio 调试
+- Platform Channel 调用添加日志便于调试

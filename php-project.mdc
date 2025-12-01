@@ -1,0 +1,125 @@
+---
+alwaysApply: true
+---
+
+# PHP 项目规则
+
+> 适用于 PHP 脚本和工具开发项目
+
+## 项目类型
+- **项目类型**：PHP 项目
+- **主要用途**：脚本和工具开发
+- **开发原则**：简单直接，快速实现功能，不需要过度设计
+
+## 代码风格
+
+### 命名规范
+- **函数/变量**：根据项目习惯选择 camelCase 或 snake_case
+- **类名**：PascalCase（如 `UserRepository`、`DataProcessor`）
+- **常量**：UPPER_SNAKE_CASE（如 `MAX_RETRY_COUNT`、`API_BASE_URL`）
+- **私有成员**：以下划线开头（如 `$_privateProperty`）
+
+### 代码规范
+- 遵循 PSR 规范（PSR-1、PSR-12）
+- 使用 4 个空格缩进
+- 代码风格根据项目习惯统一（camelCase 或 snake_case）
+
+## 架构模式
+
+### 简单脚本
+- 直接实现功能，不需要复杂架构
+- 保持代码清晰易读
+- 关键操作需要错误处理
+
+### 工具项目
+- 如果脚本会长期使用，保持代码清晰易读
+- 可以适当模块化（按功能拆分文件）
+- 避免过度设计，保持简洁
+
+## 依赖管理
+
+### Composer
+- 使用 Composer 管理依赖（如需要）
+- `composer.json` 管理依赖版本
+- `composer.lock` 锁定具体版本
+- 不要将 `vendor/` 目录提交到 Git
+
+## 错误处理
+
+### 异常处理
+- 关键操作需要错误处理
+- 简单脚本可以简单处理
+- 使用 try-catch 捕获异常
+- 使用 error_reporting 控制错误级别
+
+### 日志记录
+- 关键操作记录日志
+- 使用 error_log() 或日志库
+- 记录有意义的错误信息
+
+## 代码组织
+
+### 简单脚本
+```
+project/
+├── index.php         # 主脚本
+├── functions.php     # 工具函数（如需要）
+└── config.php        # 配置文件
+```
+
+### 工具项目
+```
+project/
+├── index.php
+├── config.php
+├── src/              # 源代码
+│   └── Processor.php
+├── utils/            # 工具类
+│   └── Helpers.php
+└── composer.json     # 依赖管理（如需要）
+```
+
+## 运行环境
+
+### PHP 版本
+- 明确 PHP 版本要求（如 PHP 7.4+ 或 PHP 8.0+）
+- 在 README 或 composer.json 中说明
+- 使用现代 PHP 特性（类型声明、命名空间等）
+
+### 跨平台兼容
+- 考虑跨平台兼容性（Windows/Linux/Mac）
+- 路径处理使用 `DIRECTORY_SEPARATOR`
+- 注意不同操作系统的差异
+
+## Git 工作流
+
+### 文件管理
+- 新创建的文件自动添加到 Git
+- 修改的文件自动添加到 Git
+- 忽略 `vendor/`、临时文件等
+
+### .gitignore
+```
+vendor/
+composer.lock
+.idea/
+*.log
+```
+
+## 其他规范
+
+### 安全
+- 遵循常规安全实践
+- 输入验证和过滤
+- 防止 SQL 注入（使用预处理语句）
+- 防止 XSS 攻击（输出转义）
+
+### 文档
+- 关键函数和类添加注释
+- 使用 PHPDoc 注释格式
+- README.md 说明项目用途和运行方法
+
+### 性能
+- 简单脚本优先快速实现
+- 如需性能优化，先确保功能正确
+- 注意数据库查询优化（如涉及数据库）
