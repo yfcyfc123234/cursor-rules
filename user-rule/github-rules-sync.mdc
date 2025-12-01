@@ -1,0 +1,296 @@
+---
+alwaysApply: true
+---
+
+# GitHub 规则自动拉取
+
+## GitHub 仓库配置
+
+- **仓库地址**：`https://github.com/{owner}/{repo}`（需要用户提供或配置）
+- **默认分支**：`main`（如果不存在则尝试 `master`）
+- **仓库结构**：与本地 `C:\Users\Administrator\Desktop\cursor-rules` 一致
+- **仓库类型**：公开仓库，无需认证
+
+## 拉取规则
+
+### 用户规则
+
+- **拉取目录**：`user-rule/` 目录下的所有 `.mdc` 文件
+- **需要拉取的文件**：
+  - `user-base-rule.mdc`
+  - `git-automation.mdc`
+  - `project-rules-auto-management.mdc`
+  - 其他 `user-rule/` 目录下的 `.mdc` 文件
+- **排除文件**：`github-rules-sync.mdc`（避免循环拉取）
+
+### 项目规则
+
+- **拉取方式**：根据项目类型自动检测或用户明确指定
+- **项目类型映射**：
+  - Flutter 混合项目 → `android-flutter-project.mdc`
+  - Flutter 项目 → `flutter-project.mdc`
+  - Android 项目 → `android-project.mdc`
+  - Python 项目 → `python-project.mdc`
+  - PHP 项目 → `php-project.mdc`
+  - Kotlin 项目 → `kotlin-project.mdc`
+  - Java 项目 → `java-project.mdc`
+
+## 执行时机
+
+- **自动触发**：当项目根目录的 `.cursor/rules/` 目录不存在或为空时
+- **手动触发**：用户明确要求"从 GitHub 拉取规则"、"同步规则"、"更新规则"或"从 GitHub 导入规则"时
+
+## 实现流程
+
+### 步骤 1：检测触发条件
+
+1. 检查项目根目录是否存在 `.cursor/rules/` 目录
+2. 如果目录不存在或为空，执行自动拉取流程
+3. 如果目录已存在且不为空：
+   - 询问用户是否覆盖现有规则文件
+   - 如果用户同意，继续执行拉取流程
+   - 如果用户拒绝，跳过并提示："ℹ️ 项目已有规则文件，跳过自动拉取。如需更新，请手动操作。"
+
+### 步骤 2：确定 GitHub 仓库信息
+
+1. **获取仓库地址**：
+   - 优先从用户明确指定的仓库地址获取
+   - 如果用户未指定，尝试从环境变量或配置中获取
+   - 如果都没有，询问用户提供仓库地址（格式：`owner/repo` 或完整 URL）
+
+2. **确定分支**：
+   - 默认使用 `main` 分支
+   - 如果 `main` 分支不存在，尝试 `master` 分支
+   - 如果用户指定了分支，使用用户指定的分支
+
+3. **构建基础 URL**：
+   - Raw Content URL 格式：`https://raw.githubusercontent.com/{owner}/{repo}/{branch}/`
+
+### 步骤 3：确定项目类型
+
+使用 `project-rules-auto-management.mdc` 中的项目类型检测逻辑：
+
+1. **Flutter 混合项目**：
+   - 检测条件：存在 `pubspec.yaml` 且存在 `android/` 目录
+   - 项目规则文件：`android-flutter-project.mdc`
+
+2. **Flutter 项目**：
+   - 检测条件：存在 `pubspec.yaml`
+   - 项目规则文件：`flutter-project.mdc`
+
+3. **Android 项目**：
+   - 检测条件：存在 `settings.gradle` 或根目录 `build.gradle`，且不存在 `pubspec.yaml`
+   - 项目规则文件：`android-project.mdc`
+
+4. **Python 项目**：
+   - 检测条件：存在 `requirements.txt` 或 `pyproject.toml`
+   - 项目规则文件：`python-project.mdc`
+
+5. **PHP 项目**：
+   - 检测条件：存在 `composer.json`
+   - 项目规则文件：`php-project.mdc`
+
+6. **其他类型**：
+   - 根据主要代码文件类型判断
+   - `.kt` 文件为主 → `kotlin-project.mdc`
+   - `.java` 文件为主 → `java-project.mdc`
+
+**用户指定项目类型**：
+- 如果用户明确说明项目类型（如"这是 Flutter 项目"），优先使用用户指定的类型
+- 忽略自动检测结果，直接使用用户指定的项目类型对应的规则文件
+
+### 步骤 4：从 GitHub 拉取文件
+
+#### 4.1 拉取用户规则
+
+对于 `user-rule/` 目录下的每个 `.mdc` 文件（排除 `github-rules-sync.mdc`）：
+
+1. **构建文件 URL**：
+   ```
+   https://raw.githubusercontent.com/{owner}/{repo}/{branch}/user-rule/{filename}
+   ```
+
+2. **拉取文件内容**：
+   - 使用 HTTP GET 请求获取文件内容
+   - 如果文件不存在（404 错误），跳过该文件并继续处理下一个
+   - 如果网络错误，记录错误并继续尝试其他文件
+
+3. **验证文件格式**：
+   - 检查文件是否包含 frontmatter（`---\nalwaysApply: true\n---`）
+   - 如果缺少 frontmatter，自动添加：
+     ```markdown
+     ---
+     alwaysApply: true
+     ---
+     
+     [文件内容]
+     ```
+
+#### 4.2 拉取项目规则
+
+1. **确定项目规则文件名**：根据步骤 3 确定的项目类型
+
+2. **构建文件 URL**：
+   ```
+   https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{project-rule-filename}
+   ```
+
+3. **拉取文件内容**：
+   - 使用 HTTP GET 请求获取文件内容
+   - 如果文件不存在（404 错误），提示用户："⚠️ 未找到对应的项目规则文件 `{filename}`，跳过项目规则拉取。"
+   - 如果网络错误，记录错误并提示用户
+
+4. **验证文件格式**：
+   - 检查文件是否包含 frontmatter
+   - 如果缺少，自动添加
+
+### 步骤 5：文件命名策略
+
+1. **用户规则文件**：
+   - 保持原文件名（如 `user-base-rule.mdc`、`git-automation.mdc`）
+
+2. **项目规则文件**：
+   - 使用描述性名称，基于项目类型：
+     - Flutter 混合项目 → `android-flutter-rules.mdc`
+     - Flutter 项目 → `flutter-rules.mdc`
+     - Android 项目 → `android-rules.mdc`
+     - Python 项目 → `python-rules.mdc`
+     - PHP 项目 → `php-rules.mdc`
+     - Kotlin 项目 → `kotlin-rules.mdc`
+     - Java 项目 → `java-rules.mdc`
+
+3. **处理文件名冲突**：
+   - 检查 `.cursor/rules/` 目录中是否已存在同名文件
+   - 如果存在，使用下一个可用名称：
+     - 如果已有 `android-rules.mdc`，使用 `android-rules2.mdc`
+     - 如果已有 `android-rules.mdc` 和 `android-rules2.mdc`，使用 `android-rules3.mdc`
+     - 依此类推，直到找到可用的文件名
+
+### 步骤 6：保存到项目
+
+1. **创建目录**：
+   - 在项目根目录创建 `.cursor/rules/` 目录（如果不存在）
+
+2. **保存文件**：
+   - 将所有成功拉取的文件保存到 `.cursor/rules/` 目录
+   - 使用步骤 5 确定的文件名
+   - 确保文件内容完整，包含 frontmatter
+
+3. **验证保存结果**：
+   - 检查文件是否成功保存
+   - 验证文件内容是否正确
+
+### 步骤 7：完成提示
+
+成功拉取并保存所有文件后，提示用户：
+
+```
+✅ 已从 GitHub 仓库拉取规则文件：
+
+用户规则：
+- user-base-rule.mdc
+- git-automation.mdc
+- project-rules-auto-management.mdc
+[其他用户规则文件]
+
+项目规则：
+- {项目规则文件名}.mdc
+
+所有规则文件已保存到 `.cursor/rules/` 目录。
+```
+
+## 错误处理
+
+### 网络错误
+
+- **症状**：无法连接到 GitHub 或请求超时
+- **处理**：提示用户检查网络连接，并询问是否重试
+- **继续执行**：如果用户选择重试，重新执行失败的请求；如果用户选择跳过，继续处理其他文件
+
+### 仓库不存在
+
+- **症状**：返回 404 错误（仓库级别）
+- **处理**：提示用户检查仓库地址是否正确，仓库是否为公开仓库
+- **停止执行**：无法继续，需要用户提供正确的仓库地址
+
+### 文件不存在
+
+- **症状**：单个文件返回 404 错误
+- **处理**：跳过该文件，记录日志，继续处理其他文件
+- **继续执行**：不影响其他文件的拉取
+
+### 权限问题
+
+- **症状**：返回 403 错误
+- **处理**：提示用户检查仓库是否为公开仓库，或是否需要认证
+- **停止执行**：如果是私有仓库，需要用户提供认证信息（但当前规则仅支持公开仓库）
+
+### 文件格式错误
+
+- **症状**：文件内容不完整或格式不正确
+- **处理**：自动修复（添加 frontmatter），如果无法修复则跳过该文件
+- **继续执行**：继续处理其他文件
+
+## 技术实现细节
+
+### GitHub Raw Content API
+
+- **URL 格式**：`https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{path}`
+- **示例**：
+  - 用户规则：`https://raw.githubusercontent.com/username/cursor-rules/main/user-rule/user-base-rule.mdc`
+  - 项目规则：`https://raw.githubusercontent.com/username/cursor-rules/main/flutter-project.mdc`
+
+### HTTP 请求
+
+- 使用标准的 HTTP GET 请求
+- 设置合理的超时时间（建议 10 秒）
+- 处理 HTTP 状态码：
+  - 200：成功
+  - 404：文件或仓库不存在
+  - 403：权限问题
+  - 其他：网络错误或服务器错误
+
+### 文件内容处理
+
+- 确保所有文件包含 frontmatter
+- 保持文件内容的原始格式
+- 处理不同操作系统的换行符差异
+
+## 使用示例
+
+### 自动触发场景
+
+当用户在 Cursor 中打开一个新项目（`.cursor/rules/` 目录不存在或为空）时：
+
+1. 自动检测项目类型（如 Flutter 项目）
+2. 从 GitHub 拉取所有用户规则和对应的项目规则（`flutter-project.mdc`）
+3. 保存到项目的 `.cursor/rules/` 目录
+4. 提示用户拉取完成
+
+### 手动触发场景
+
+用户明确要求："从 GitHub 拉取规则" 或 "同步规则"：
+
+1. 询问用户 GitHub 仓库地址（如果未配置）
+2. 检测项目类型或询问用户项目类型
+3. 从 GitHub 拉取规则文件
+4. 如果项目已有规则文件，询问是否覆盖
+5. 保存文件并提示完成
+
+### 指定仓库地址场景
+
+用户说明："从 `username/cursor-rules` 仓库拉取规则"：
+
+1. 使用用户指定的仓库地址
+2. 执行拉取流程
+3. 保存文件并提示完成
+
+## 注意事项
+
+- **避免循环拉取**：排除 `github-rules-sync.mdc` 文件，避免无限循环
+- **文件完整性**：确保拉取的文件包含完整的 frontmatter，否则 Cursor 可能无法正确加载
+- **网络依赖**：需要网络连接才能从 GitHub 拉取文件
+- **仓库公开性**：当前规则仅支持公开仓库，私有仓库需要额外的认证配置
+- **分支选择**：优先使用 `main` 分支，如果不存在则尝试 `master` 分支
+- **错误恢复**：单个文件拉取失败不应影响其他文件的拉取
+- **文件冲突**：如果项目已存在同名规则文件，使用递增的数字后缀避免覆盖
