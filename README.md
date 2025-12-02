@@ -19,21 +19,25 @@
 系统能够自动识别以下项目类型：
 
 **移动端/跨平台：**
+
 - **Flutter 项目**：存在 `pubspec.yaml`（支持多平台：Android、iOS、Web 等，包含 Platform Channel 相关内容）
 - **Android 项目**：存在 `settings.gradle` 或根目录 `build.gradle`
 - **React Native 项目**：存在 `package.json` 且依赖中包含 `react-native`
 - **iOS 项目**：存在 `*.xcodeproj` 或 `*.xcworkspace` 文件
 
 **Web 前端：**
+
 - **Next.js 项目**：存在 `package.json` 且依赖中包含 `next`
 - **React 项目**：存在 `package.json` 且依赖中包含 `react`
 - **Vue 项目**：存在 `package.json` 且依赖中包含 `vue`
 
 **后端/全栈：**
+
 - **Node.js 项目**：存在 `package.json` 且为后端项目
 - **Spring Boot 项目**：存在 `pom.xml` 或 `build.gradle` 且包含 Spring Boot 依赖
 
 **其他：**
+
 - **Python 项目**：存在 `requirements.txt` 或 `pyproject.toml`
 - **PHP 项目**：存在 `composer.json`
 - **TypeScript 项目**：存在 `tsconfig.json`
@@ -73,21 +77,25 @@
 位于根目录，根据项目类型匹配：
 
 **移动端/跨平台：**
+
 - `android-project.mdc` - Android 项目规则
 - `flutter-project.mdc` - Flutter 项目规则（支持多平台，包含 Platform Channel 相关内容）
 - `react-native-project.mdc` - React Native 项目规则
 - `ios-project.mdc` - iOS 项目规则
 
 **Web 前端：**
+
 - `react-project.mdc` - React 项目规则
 - `vue-project.mdc` - Vue 项目规则
 - `nextjs-project.mdc` - Next.js 项目规则
 
 **后端/全栈：**
+
 - `nodejs-project.mdc` - Node.js 项目规则
 - `spring-boot-project.mdc` - Spring Boot 项目规则
 
 **其他：**
+
 - `python-project.mdc` - Python 项目规则
 - `php-project.mdc` - PHP 项目规则
 - `typescript-project.mdc` - TypeScript 项目规则
@@ -105,7 +113,8 @@
 
 支持以下自然语言指令：
 
-**导入规则**：
+**导入规则：**
+
 - "导入规则"
 - "帮我导入规则"
 - "导入安卓规则"
@@ -113,7 +122,8 @@
 - "这是 Flutter 项目，导入规则"
 - "这是一个 Android 项目"
 
-**更新规则**：
+**更新规则：**
+
 - "更新规则"
 - "同步规则"
 - "刷新规则"
@@ -131,7 +141,7 @@
 
 ## 📁 项目结构
 
-```
+```text
 cursor-rules/
 ├── README.md                          # 项目说明文档（本文件）
 ├── common-rules/                       # 通用规则（适用于所有项目）
@@ -173,7 +183,7 @@ cursor-rules/
 
 在 Cursor 中与 AI 对话：
 
-```
+```text
 用户：帮我导入规则
 AI：检测到这是一个 Flutter 项目，正在从 GitHub 拉取规则...
 AI：✅ 已成功导入规则文件到 .cursor/rules/ 目录
@@ -183,7 +193,7 @@ AI：✅ 已成功导入规则文件到 .cursor/rules/ 目录
 
 在空白文件夹中：
 
-```
+```text
 用户：这是一个 Flutter 项目，导入规则
 AI：正在为 Flutter 项目导入规则...
 AI：✅ 已成功导入 Flutter 项目规则
@@ -191,7 +201,7 @@ AI：✅ 已成功导入 Flutter 项目规则
 
 ### 场景 4：使用蓝湖设计图
 
-```
+```text
 用户：[上传蓝湖设计图]
 用户：帮我根据这个设计图还原页面，这是沉浸式栏的 APP 项目
 AI：正在分析设计图，将按照一比一像素还原...
@@ -237,6 +247,7 @@ alwaysApply: true
 - **常见问题避免**：避免 Markdown lint 等工具的格式警告
 
 遵循这些规范可以：
+
 - ✅ 保持文档格式统一
 - ✅ 避免格式警告
 - ✅ 提高文档可读性
@@ -361,6 +372,7 @@ alwaysApply: true
 ### 检测优先级
 
 **移动端/跨平台：**
+
 1. **Flutter 项目**
    - 条件：`pubspec.yaml`
    - 规则：`flutter-project.mdc`
@@ -379,44 +391,47 @@ alwaysApply: true
    - 规则：`ios-project.mdc`
 
 **Web 前端：**
-5. **Next.js 项目**
+
+1. **Next.js 项目**
    - 条件：`package.json` + 依赖包含 `next`
    - 规则：`nextjs-project.mdc`
 
-6. **React 项目**
+2. **React 项目**
    - 条件：`package.json` + 依赖包含 `react`，且无 `react-native` 和 `next`
    - 规则：`react-project.mdc`
 
-7. **Vue 项目`
+3. **Vue 项目**
    - 条件：`package.json` + 依赖包含 `vue`
    - 规则：`vue-project.mdc`
 
 **后端/全栈：**
-8. **Spring Boot 项目`
+
+1. **Spring Boot 项目**
    - 条件：`pom.xml` 或 `build.gradle` + 包含 Spring Boot 依赖
    - 规则：`spring-boot-project.mdc`
 
-9. **Node.js 项目`
-    - 条件：`package.json` + 后端项目
-    - 规则：`nodejs-project.mdc`
+2. **Node.js 项目**
+   - 条件：`package.json` + 后端项目
+   - 规则：`nodejs-project.mdc`
 
 **其他：**
-10. **Python 项目`
-    - 条件：`requirements.txt` 或 `pyproject.toml`
-    - 规则：`python-project.mdc`
 
-11. **PHP 项目**
-    - 条件：`composer.json`
-    - 规则：`php-project.mdc`
+1. **Python 项目**
+   - 条件：`requirements.txt` 或 `pyproject.toml`
+   - 规则：`python-project.mdc`
 
-12. **TypeScript 项目**
-    - 条件：`tsconfig.json`
-    - 规则：`typescript-project.mdc`
+2. **PHP 项目**
+   - 条件：`composer.json`
+   - 规则：`php-project.mdc`
 
-13. **其他类型**
-    - 根据主要代码文件类型判断
-    - `.kt` 文件为主 → `kotlin-project.mdc`
-    - `.java` 文件为主 → `java-project.mdc`
+3. **TypeScript 项目**
+   - 条件：`tsconfig.json`
+   - 规则：`typescript-project.mdc`
+
+4. **其他类型**
+   - 根据主要代码文件类型判断
+   - `.kt` 文件为主 → `kotlin-project.mdc`
+   - `.java` 文件为主 → `java-project.mdc`
 
 ## 📋 待实现功能
 
@@ -498,4 +513,3 @@ alwaysApply: true
 **最后更新**：2025-01-27
 
 **维护者**：yfcyfc123234
-
