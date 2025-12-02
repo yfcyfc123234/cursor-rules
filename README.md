@@ -64,6 +64,7 @@
 - `ui-design-reconstruction.mdc` - UI 设计图还原规则
 - `project-rules-auto-management.mdc` - 项目规则管理规则
 - `rules-conflict-management.mdc` - 规则冲突管理规则
+- `documentation-format.mdc` - 文档格式规范规则
 - `batch-file-operations.mdc` - 批量文件操作优化规则
 - `github-rules-sync.mdc` - GitHub 同步规则
 
@@ -222,6 +223,24 @@ alwaysApply: true
 
 规则内容...
 ```
+
+### 文档格式规范
+
+项目中的所有文档（包括 Markdown 文档、代码注释、配置文件注释等）都应该遵循统一的格式规范，避免格式警告。
+
+详细规范请参考 `documentation-format.mdc` 文件，主要包括：
+
+- **Markdown 文档格式**：标题、列表、代码块、链接、表格等格式规范
+- **代码注释格式**：函数注释、类注释、API 文档注释格式
+- **配置文件注释**：配置文件中的注释格式
+- **格式检查清单**：文档创建和修改后的检查项
+- **常见问题避免**：避免 Markdown lint 等工具的格式警告
+
+遵循这些规范可以：
+- ✅ 保持文档格式统一
+- ✅ 避免格式警告
+- ✅ 提高文档可读性
+- ✅ 便于维护和更新
 
 ## 🔄 工作流程
 
@@ -386,15 +405,15 @@ alwaysApply: true
     - 条件：`requirements.txt` 或 `pyproject.toml`
     - 规则：`python-project.mdc`
 
-11. **PHP 项目`
+11. **PHP 项目**
     - 条件：`composer.json`
     - 规则：`php-project.mdc`
 
-12. **TypeScript 项目`
+12. **TypeScript 项目**
     - 条件：`tsconfig.json`
     - 规则：`typescript-project.mdc`
 
-13. **其他类型`
+13. **其他类型**
     - 根据主要代码文件类型判断
     - `.kt` 文件为主 → `kotlin-project.mdc`
     - `.java` 文件为主 → `java-project.mdc`
