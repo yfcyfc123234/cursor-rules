@@ -6,9 +6,37 @@ alwaysApply: true
 
 ## 规则文件夹配置
 
-- **规则文件夹路径**：`C:\Users\Administrator\Desktop\cursor-rules`
+### 默认配置
+
+- **规则文件夹路径（本地缓存）**：`C:\Users\Administrator\Desktop\cursor-rules`
 - **GitHub 仓库**：`https://github.com/yfcyfc123234/cursor-rules`
 - **规则文件格式**：`.mdc` 格式，必须包含 frontmatter 元数据
+
+### 配置检测和用户提示
+
+在执行规则管理前，需要检测配置是否可用：
+
+1. **检测本地缓存路径**
+   - 检查默认路径是否存在
+   - 如果路径不存在或无法访问：
+     - 提示用户："⚠️ 本地缓存路径不存在或无法访问：`C:\Users\Administrator\Desktop\cursor-rules`"
+     - 询问用户："请输入正确的本地缓存路径，或按 Enter 跳过本地缓存"
+     - 验证用户输入的路径：
+       - 检查路径是否存在
+       - 检查路径是否可读
+     - 如果用户跳过，记录并继续（可能仅使用 GitHub）
+
+2. **检测 GitHub 仓库**
+   - 尝试访问默认 GitHub 仓库
+   - 如果访问失败：
+     - 提示用户："⚠️ 无法访问 GitHub 仓库：`https://github.com/yfcyfc123234/cursor-rules`"
+     - 询问用户："请输入正确的 GitHub 仓库地址（格式：owner/repo 或完整 URL），或按 Enter 跳过 GitHub"
+     - 验证用户输入的仓库地址格式
+     - 如果用户跳过，记录并继续（可能仅使用本地缓存）
+
+3. **配置验证**
+   - 至少需要有一个可用的规则来源（本地缓存或 GitHub）
+   - 如果两者都不可用，提示用户："❌ 无法找到可用的规则来源，请配置本地缓存路径或 GitHub 仓库地址"
 - **规则文件命名规范**：
   - Android 项目：`android-project.mdc`
   - Flutter 项目：`flutter-project.mdc`
