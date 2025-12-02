@@ -6,21 +6,24 @@ alwaysApply: true
 
 ## GitHub 仓库配置
 
-- **仓库地址**：`https://github.com/{owner}/{repo}`（需要用户提供或配置）
+- **仓库地址**：`https://github.com/yfcyfc123234/cursor-rules`
 - **默认分支**：`main`（如果不存在则尝试 `master`）
-- **仓库结构**：与本地 `C:\Users\Administrator\Desktop\cursor-rules` 一致
+- **Raw Content URL 基础路径**：`https://raw.githubusercontent.com/yfcyfc123234/cursor-rules/main/`
+- **本地缓存路径**：`C:\Users\Administrator\Desktop\cursor-rules`
+- **仓库结构**：与本地缓存路径保持一致
 - **仓库类型**：公开仓库，无需认证
 
 ## 拉取规则
 
-### 用户规则
+### 通用规则
 
-- **拉取目录**：`user-rule/` 目录下的所有 `.mdc` 文件
+- **拉取目录**：`common-rules/` 目录下的所有 `.mdc` 文件
 - **需要拉取的文件**：
   - `user-base-rule.mdc`
   - `git-automation.mdc`
   - `project-rules-auto-management.mdc`
-  - 其他 `user-rule/` 目录下的 `.mdc` 文件
+  - `batch-file-operations.mdc`
+  - 其他 `common-rules/` 目录下的 `.mdc` 文件
 - **排除文件**：`github-rules-sync.mdc`（避免循环拉取）
 
 ### 项目规则
@@ -54,9 +57,9 @@ alwaysApply: true
 ### 步骤 2：确定 GitHub 仓库信息
 
 1. **获取仓库地址**：
-   - 优先从用户明确指定的仓库地址获取
-   - 如果用户未指定，尝试从环境变量或配置中获取
-   - 如果都没有，询问用户提供仓库地址（格式：`owner/repo` 或完整 URL）
+   - 默认使用：`https://github.com/yfcyfc123234/cursor-rules`
+   - 优先从用户明确指定的仓库地址获取（如果用户指定）
+   - 如果用户未指定，使用默认仓库地址
 
 2. **确定分支**：
    - 默认使用 `main` 分支
@@ -64,7 +67,8 @@ alwaysApply: true
    - 如果用户指定了分支，使用用户指定的分支
 
 3. **构建基础 URL**：
-   - Raw Content URL 格式：`https://raw.githubusercontent.com/{owner}/{repo}/{branch}/`
+   - Raw Content URL 格式：`https://raw.githubusercontent.com/yfcyfc123234/cursor-rules/{branch}/`
+   - 默认完整路径：`https://raw.githubusercontent.com/yfcyfc123234/cursor-rules/main/`
 
 ### 步骤 3：确定项目类型
 
@@ -101,13 +105,13 @@ alwaysApply: true
 
 ### 步骤 4：从 GitHub 拉取文件
 
-#### 4.1 拉取用户规则
+#### 4.1 拉取通用规则
 
-对于 `user-rule/` 目录下的每个 `.mdc` 文件（排除 `github-rules-sync.mdc`）：
+对于 `common-rules/` 目录下的每个 `.mdc` 文件（排除 `github-rules-sync.mdc`）：
 
 1. **构建文件 URL**：
    ```
-   https://raw.githubusercontent.com/{owner}/{repo}/{branch}/user-rule/{filename}
+   https://raw.githubusercontent.com/{owner}/{repo}/{branch}/common-rules/{filename}
    ```
 
 2. **拉取文件内容**：
@@ -146,7 +150,7 @@ alwaysApply: true
 
 ### 步骤 5：文件命名策略
 
-1. **用户规则文件**：
+1. **通用规则文件**：
    - 保持原文件名（如 `user-base-rule.mdc`、`git-automation.mdc`）
 
 2. **项目规则文件**：
@@ -166,18 +170,25 @@ alwaysApply: true
      - 如果已有 `android-rules.mdc` 和 `android-rules2.mdc`，使用 `android-rules3.mdc`
      - 依此类推，直到找到可用的文件名
 
-### 步骤 6：保存到项目
+### 步骤 6：保存到项目和本地缓存
 
 1. **创建目录**：
    - 在项目根目录创建 `.cursor/rules/` 目录（如果不存在）
+   - 确保本地缓存目录存在（`C:\Users\Administrator\Desktop\cursor-rules`）
 
-2. **保存文件**：
-   - 将所有成功拉取的文件保存到 `.cursor/rules/` 目录
+2. **保存到项目**：
+   - 将所有成功拉取的文件保存到项目的 `.cursor/rules/` 目录
    - 使用步骤 5 确定的文件名
    - 确保文件内容完整，包含 frontmatter
 
-3. **验证保存结果**：
-   - 检查文件是否成功保存
+3. **更新本地缓存**：
+   - 从 GitHub 拉取成功后，同时更新本地缓存
+   - 保存到本地缓存路径的对应位置
+   - 确保本地缓存与 GitHub 仓库同步
+
+4. **验证保存结果**：
+   - 检查文件是否成功保存到项目
+   - 检查文件是否成功保存到本地缓存
    - 验证文件内容是否正确
 
 ### 步骤 7：完成提示
@@ -187,11 +198,12 @@ alwaysApply: true
 ```
 ✅ 已从 GitHub 仓库拉取规则文件：
 
-用户规则：
+通用规则：
 - user-base-rule.mdc
 - git-automation.mdc
 - project-rules-auto-management.mdc
-[其他用户规则文件]
+- batch-file-operations.mdc
+[其他通用规则文件]
 
 项目规则：
 - {项目规则文件名}.mdc
@@ -236,9 +248,9 @@ alwaysApply: true
 ### GitHub Raw Content API
 
 - **URL 格式**：`https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{path}`
-- **示例**：
-  - 用户规则：`https://raw.githubusercontent.com/username/cursor-rules/main/user-rule/user-base-rule.mdc`
-  - 项目规则：`https://raw.githubusercontent.com/username/cursor-rules/main/flutter-project.mdc`
+- **实际 URL**：
+  - 通用规则：`https://raw.githubusercontent.com/yfcyfc123234/cursor-rules/main/common-rules/user-base-rule.mdc`
+  - 项目规则：`https://raw.githubusercontent.com/yfcyfc123234/cursor-rules/main/flutter-project.mdc`
 
 ### HTTP 请求
 
@@ -263,7 +275,7 @@ alwaysApply: true
 当用户在 Cursor 中打开一个新项目（`.cursor/rules/` 目录不存在或为空）时：
 
 1. 自动检测项目类型（如 Flutter 项目）
-2. 从 GitHub 拉取所有用户规则和对应的项目规则（`flutter-project.mdc`）
+2. 从 GitHub 拉取所有通用规则和对应的项目规则（`flutter-project.mdc`）
 3. 保存到项目的 `.cursor/rules/` 目录
 4. 提示用户拉取完成
 
@@ -285,6 +297,28 @@ alwaysApply: true
 2. 执行拉取流程
 3. 保存文件并提示完成
 
+## 本地缓存机制
+
+### 缓存策略
+
+1. **优先使用本地缓存**
+   - 首先检查本地缓存路径（`C:\Users\Administrator\Desktop\cursor-rules`）
+   - 如果本地存在规则文件，直接使用本地文件
+
+2. **GitHub 作为备用**
+   - 如果本地不存在，从 GitHub 拉取
+   - 拉取成功后更新本地缓存
+
+3. **自动同步**
+   - 从 GitHub 拉取成功后，自动保存到本地缓存
+   - 确保本地缓存与 GitHub 仓库保持同步
+
+### 缓存更新
+
+- **更新时机**：从 GitHub 成功拉取文件后
+- **更新位置**：`C:\Users\Administrator\Desktop\cursor-rules`
+- **更新内容**：所有成功拉取的规则文件
+
 ## 注意事项
 
 - **避免循环拉取**：排除 `github-rules-sync.mdc` 文件，避免无限循环
@@ -294,3 +328,4 @@ alwaysApply: true
 - **分支选择**：优先使用 `main` 分支，如果不存在则尝试 `master` 分支
 - **错误恢复**：单个文件拉取失败不应影响其他文件的拉取
 - **文件冲突**：如果项目已存在同名规则文件，使用递增的数字后缀避免覆盖
+- **本地缓存**：从 GitHub 拉取成功后自动更新本地缓存，确保同步

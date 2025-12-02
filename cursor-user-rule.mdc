@@ -1,0 +1,118 @@
+---
+alwaysApply: true
+---
+
+# Cursor 项目规则自动导入系统
+
+> 这是一个规则自动导入系统的触发规则。当用户说"导入规则"或类似指令时，自动从 GitHub 或本地缓存拉取对应的项目规则。
+
+## 核心功能
+
+当用户明确要求导入规则时，执行以下流程：
+
+1. **识别用户指令**
+   - **导入规则**：
+     - "导入规则"
+     - "帮我导入规则"
+     - "导入安卓规则" / "导入 Android 规则"
+     - "导入 Flutter 规则"
+     - "导入 Python 规则"
+     - "这是 Flutter 项目，导入规则"
+     - "这是一个 Android 项目"
+   - **更新规则**：
+     - "更新规则"
+     - "同步规则"
+     - "刷新规则"
+     - "重新导入规则"
+     - "更新项目规则"
+     - 当规则项目数据发生变化时，使用这些指令更新当前项目的规则文件
+
+2. **检测项目类型**
+   - 自动检测项目类型（通过文件特征）
+   - 支持用户明确指定项目类型
+   - 空白文件夹支持用户描述项目类型
+
+3. **拉取规则文件**
+   - **规则来源**：
+     - 本地缓存：`C:\Users\Administrator\Desktop\cursor-rules`
+     - GitHub 仓库：`https://github.com/yfcyfc123234/cursor-rules`
+   - **拉取策略**：优先从本地缓存拉取，本地不存在时从 GitHub 拉取
+   - **拉取内容**：
+     - 通用规则：从 `common-rules/` 目录拉取（适用于所有项目）
+     - 项目规则：根据项目类型匹配对应的 `*-project.mdc` 文件
+
+4. **导入到项目**
+   - 将所有规则文件保存到项目的 `.cursor/rules/` 目录
+   - 验证 frontmatter 格式
+   - 处理文件名冲突（使用递增后缀）
+
+## 详细流程
+
+详细的导入流程和规则说明请参考：
+- `common-rules/auto-import-rules.mdc` - 完整的规则导入流程
+- `common-rules/project-rules-auto-management.mdc` - 项目类型检测和规则管理
+- `common-rules/github-rules-sync.mdc` - GitHub 同步机制
+
+## 项目类型检测
+
+系统能够自动识别以下项目类型：
+
+- **Flutter 混合项目**：存在 `pubspec.yaml` 且存在 `android/` 目录
+- **Flutter 项目**：存在 `pubspec.yaml`
+- **Android 项目**：存在 `settings.gradle` 或根目录 `build.gradle`
+- **Python 项目**：存在 `requirements.txt` 或 `pyproject.toml`
+- **PHP 项目**：存在 `composer.json`
+- **Kotlin/Java 项目**：根据主要代码文件类型判断
+
+## 使用示例
+
+### 示例 1：自动检测项目类型
+
+```
+用户：帮我导入规则
+AI：检测到这是一个 Flutter 项目，正在导入规则...
+AI：✅ 已成功导入规则文件到 .cursor/rules/ 目录
+```
+
+### 示例 2：用户指定项目类型
+
+```
+用户：这是一个 Python 项目，导入规则
+AI：正在为 Python 项目导入规则...
+AI：✅ 已成功导入规则文件
+```
+
+### 示例 3：空白文件夹
+
+```
+用户：这是一个新的 Flutter 项目，导入规则
+AI：正在为 Flutter 项目导入规则...
+AI：✅ 已成功导入规则文件
+```
+
+### 示例 4：更新规则
+
+```
+用户：更新规则
+AI：检测到规则项目有更新，正在更新当前项目的规则文件...
+AI：✅ 已成功更新规则文件到最新版本
+```
+
+## 注意事项
+
+1. **规则来源优先级**：本地缓存 > GitHub 仓库
+2. **文件完整性**：所有规则文件必须包含 frontmatter
+3. **错误处理**：单个文件拉取失败不应影响其他文件的拉取
+4. **规则优先级**：项目规则 > 通用规则（项目特定规则优先）
+
+## 配置信息
+
+- **GitHub 仓库**：`https://github.com/yfcyfc123234/cursor-rules`
+- **默认分支**：`main`
+- **本地缓存路径**：`C:\Users\Administrator\Desktop\cursor-rules`
+- **通用规则目录**：`common-rules/`
+- **项目规则目录**：根目录（`*-project.mdc` 文件）
+
+---
+
+**说明**：此文件用于在 Cursor 中手动配置，作为规则自动导入系统的触发规则。详细的导入流程和规则说明请参考 `common-rules/` 目录下的相关文件。
