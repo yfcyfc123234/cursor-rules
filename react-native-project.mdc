@@ -1,0 +1,152 @@
+---
+alwaysApply: true
+---
+
+# React Native 项目规则
+
+> 适用于 React Native 跨平台移动应用开发项目
+
+## 项目类型
+- **项目类型**：React Native 项目
+- **主要语言**：JavaScript/TypeScript
+- **框架版本**：遵循项目指定的 React Native 版本
+
+## 代码风格
+
+### 命名规范
+- **组件名**：PascalCase（如 `UserProfile`、`HomeScreen`）
+- **方法/变量**：camelCase（如 `fetchUserData()`、`userName`）
+- **常量**：UPPER_SNAKE_CASE（如 `MAX_RETRY_COUNT`）
+- **文件名**：组件文件使用 PascalCase，其他文件使用 camelCase
+
+### UI 布局
+- 使用 Flexbox 布局（React Native 默认）
+- 使用响应式设计，考虑不同屏幕尺寸
+- 使用 StyleSheet 创建样式，避免内联样式
+- 优先使用 React Native 原生组件，需要时使用第三方库
+
+### 架构模式
+- 使用 Context API、Redux、Zustand 等状态管理方案（根据项目选择）
+- 业务逻辑与 UI 分离
+- 使用自定义 Hooks 封装复用逻辑
+- 组件保持单一职责，保持简洁
+
+### 异步处理
+- 使用 async/await 处理异步操作
+- 使用 Promise 处理网络请求
+- 注意异步操作的错误处理
+
+## 依赖管理
+
+### package.json
+- 版本号使用精确版本或版本范围
+- 定期更新依赖版本，注意兼容性
+- React Native 版本升级需要特别注意兼容性
+
+### 常用库
+- **导航**：React Navigation
+- **状态管理**：根据项目选择（Context、Redux、Zustand 等）
+- **网络请求**：fetch、axios 等
+- **UI 组件库**：React Native Elements、NativeBase 等（根据项目选择）
+
+## 代码组织
+
+### 目录结构
+```
+src/
+├── components/        # 通用组件
+│   ├── Button/
+│   │   ├── index.js
+│   │   └── Button.js
+│   └── Card/
+├── screens/          # 页面/屏幕
+│   ├── HomeScreen.js
+│   └── ProfileScreen.js
+├── navigation/       # 导航配置
+├── services/         # API 服务
+├── hooks/           # 自定义 Hooks
+├── utils/           # 工具函数
+├── constants/       # 常量
+└── assets/          # 静态资源
+```
+
+### 组件组织
+- 每个组件一个文件夹，包含组件文件和样式文件
+- 使用 index.js 导出组件，便于导入
+- 保持组件简洁，复杂逻辑提取到自定义 Hooks
+
+## 平台特定代码
+
+### Platform API
+- 使用 `Platform.OS` 检测平台（'ios' 或 'android'）
+- 平台特定代码放在 `.ios.js` 或 `.android.js` 文件中
+- 使用 `Platform.select()` 进行平台特定样式
+
+### 原生模块
+- 需要原生功能时使用 Native Modules
+- 使用 Platform Channel 与原生代码交互
+- 注意 iOS 和 Android 的实现差异
+
+## 错误处理
+
+### 异常处理
+- 使用 try-catch 捕获异常
+- 关键操作需要错误处理
+- 提供有意义的错误信息
+- 使用错误边界（Error Boundary）捕获组件错误
+
+### 日志记录
+- 使用 console.log 进行调试（开发环境）
+- 生产环境使用专业的日志库
+- 关键操作记录日志
+
+## 性能优化
+
+### 性能要求
+- 一般即可，不需要极致优化
+- 避免明显的性能问题
+- 保持代码可维护性
+
+### 优化建议
+- 使用 `React.memo` 优化组件渲染
+- 使用 `useMemo` 和 `useCallback` 优化计算和回调
+- 图片使用合适的分辨率和格式
+- 列表使用 `FlatList` 或 `SectionList`
+
+## 国际化
+
+### 当前需求
+- 暂不需要国际化
+- 预留空间：代码设计时尽量给国际化留出实现空间
+- 字符串资源：使用常量文件，避免硬编码
+
+## Git 工作流
+
+### 文件管理
+- 新创建的文件自动添加到 Git
+- 修改的文件自动添加到 Git
+- 忽略 `node_modules/`、`.expo/`、`ios/Pods/`、`android/.gradle/` 等
+
+### .gitignore
+```
+node_modules/
+.expo/
+.expo-shared/
+ios/Pods/
+ios/build/
+android/.gradle/
+android/app/build/
+*.log
+```
+
+## 其他规范
+
+### 代码质量
+- 保持代码简洁、易读
+- 避免过度设计
+- 单一职责原则
+- 使用 ESLint 和 Prettier 保持代码风格统一
+
+### 测试
+- 关键业务逻辑可测试
+- UI 组件测试（根据项目需要）

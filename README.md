@@ -18,11 +18,25 @@
 
 系统能够自动识别以下项目类型：
 
-- **Flutter 混合项目**：存在 `pubspec.yaml` 且存在 `android/` 目录
-- **Flutter 项目**：存在 `pubspec.yaml`
+**移动端/跨平台：**
+- **Flutter 项目**：存在 `pubspec.yaml`（支持多平台：Android、iOS、Web 等，包含 Platform Channel 相关内容）
 - **Android 项目**：存在 `settings.gradle` 或根目录 `build.gradle`
+- **React Native 项目**：存在 `package.json` 且依赖中包含 `react-native`
+- **iOS 项目**：存在 `*.xcodeproj` 或 `*.xcworkspace` 文件
+
+**Web 前端：**
+- **Next.js 项目**：存在 `package.json` 且依赖中包含 `next`
+- **React 项目**：存在 `package.json` 且依赖中包含 `react`
+- **Vue 项目**：存在 `package.json` 且依赖中包含 `vue`
+
+**后端/全栈：**
+- **Node.js 项目**：存在 `package.json` 且为后端项目
+- **Spring Boot 项目**：存在 `pom.xml` 或 `build.gradle` 且包含 Spring Boot 依赖
+
+**其他：**
 - **Python 项目**：存在 `requirements.txt` 或 `pyproject.toml`
 - **PHP 项目**：存在 `composer.json`
+- **TypeScript 项目**：存在 `tsconfig.json`
 - **Kotlin/Java 项目**：根据主要代码文件类型判断
 
 ### 2. 规则自动拉取
@@ -56,11 +70,25 @@
 
 位于根目录，根据项目类型匹配：
 
+**移动端/跨平台：**
 - `android-project.mdc` - Android 项目规则
-- `flutter-project.mdc` - Flutter 项目规则
-- `android-flutter-project.mdc` - Android+Flutter 混合项目规则
+- `flutter-project.mdc` - Flutter 项目规则（支持多平台，包含 Platform Channel 相关内容）
+- `react-native-project.mdc` - React Native 项目规则
+- `ios-project.mdc` - iOS 项目规则
+
+**Web 前端：**
+- `react-project.mdc` - React 项目规则
+- `vue-project.mdc` - Vue 项目规则
+- `nextjs-project.mdc` - Next.js 项目规则
+
+**后端/全栈：**
+- `nodejs-project.mdc` - Node.js 项目规则
+- `spring-boot-project.mdc` - Spring Boot 项目规则
+
+**其他：**
 - `python-project.mdc` - Python 项目规则
 - `php-project.mdc` - PHP 项目规则
+- `typescript-project.mdc` - TypeScript 项目规则
 - `kotlin-project.mdc` - Kotlin 项目规则
 - `java-project.mdc` - Java 项目规则
 
@@ -113,8 +141,15 @@ cursor-rules/
 │   ├── batch-file-operations.mdc      # 批量文件操作优化规则
 │   └── github-rules-sync.mdc          # GitHub 同步规则
 ├── android-project.mdc                # Android 项目规则
-├── flutter-project.mdc                # Flutter 项目规则
-├── android-flutter-project.mdc       # Android+Flutter 混合项目规则
+├── flutter-project.mdc                # Flutter 项目规则（支持多平台）
+├── react-native-project.mdc           # React Native 项目规则
+├── ios-project.mdc                    # iOS 项目规则
+├── react-project.mdc                  # React 项目规则
+├── vue-project.mdc                    # Vue 项目规则
+├── nextjs-project.mdc                 # Next.js 项目规则
+├── typescript-project.mdc             # TypeScript 项目规则
+├── nodejs-project.mdc                 # Node.js 项目规则
+├── spring-boot-project.mdc            # Spring Boot 项目规则
 ├── python-project.mdc                 # Python 项目规则
 ├── php-project.mdc                    # PHP 项目规则
 ├── kotlin-project.mdc                 # Kotlin 项目规则
@@ -259,30 +294,63 @@ alwaysApply: true
 
 ### 检测优先级
 
-1. **Flutter 混合项目**
-   - 条件：`pubspec.yaml` + `android/` 目录
-   - 规则：`android-flutter-project.mdc`
-
-2. **Flutter 项目**
+**移动端/跨平台：**
+1. **Flutter 项目**
    - 条件：`pubspec.yaml`
    - 规则：`flutter-project.mdc`
+   - 说明：Flutter 项目天然支持多平台（Android、iOS、Web 等），Platform Channel 相关内容已包含在规则中
+
+2. **React Native 项目**
+   - 条件：`package.json` + 依赖包含 `react-native`
+   - 规则：`react-native-project.mdc`
 
 3. **Android 项目**
    - 条件：`settings.gradle` 或 `build.gradle`，且无 `pubspec.yaml`
    - 规则：`android-project.mdc`
 
-4. **Python 项目**
-   - 条件：`requirements.txt` 或 `pyproject.toml`
-   - 规则：`python-project.mdc`
+4. **iOS 项目**
+   - 条件：`*.xcodeproj` 或 `*.xcworkspace` 或 `Podfile`
+   - 规则：`ios-project.mdc`
 
-5. **PHP 项目**
-   - 条件：`composer.json`
-   - 规则：`php-project.mdc`
+**Web 前端：**
+5. **Next.js 项目**
+   - 条件：`package.json` + 依赖包含 `next`
+   - 规则：`nextjs-project.mdc`
 
-6. **其他类型**
-   - 根据主要代码文件类型判断
-   - `.kt` 文件为主 → `kotlin-project.mdc`
-   - `.java` 文件为主 → `java-project.mdc`
+6. **React 项目**
+   - 条件：`package.json` + 依赖包含 `react`，且无 `react-native` 和 `next`
+   - 规则：`react-project.mdc`
+
+7. **Vue 项目`
+   - 条件：`package.json` + 依赖包含 `vue`
+   - 规则：`vue-project.mdc`
+
+**后端/全栈：**
+8. **Spring Boot 项目`
+   - 条件：`pom.xml` 或 `build.gradle` + 包含 Spring Boot 依赖
+   - 规则：`spring-boot-project.mdc`
+
+9. **Node.js 项目`
+    - 条件：`package.json` + 后端项目
+    - 规则：`nodejs-project.mdc`
+
+**其他：**
+10. **Python 项目`
+    - 条件：`requirements.txt` 或 `pyproject.toml`
+    - 规则：`python-project.mdc`
+
+11. **PHP 项目`
+    - 条件：`composer.json`
+    - 规则：`php-project.mdc`
+
+12. **TypeScript 项目`
+    - 条件：`tsconfig.json`
+    - 规则：`typescript-project.mdc`
+
+13. **其他类型`
+    - 根据主要代码文件类型判断
+    - `.kt` 文件为主 → `kotlin-project.mdc`
+    - `.java` 文件为主 → `java-project.mdc`
 
 ## 📋 待实现功能
 

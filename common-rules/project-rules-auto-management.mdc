@@ -39,12 +39,19 @@ alwaysApply: true
    - 如果两者都不可用，提示用户："❌ 无法找到可用的规则来源，请配置本地缓存路径或 GitHub 仓库地址"
 - **规则文件命名规范**：
   - Android 项目：`android-project.mdc`
-  - Flutter 项目：`flutter-project.mdc`
-  - Android+Flutter 混合项目：`android-flutter-project.mdc`
+  - Flutter 项目：`flutter-project.mdc`（支持多平台，包含 Platform Channel 相关内容）
   - Python 项目：`python-project.mdc`
   - PHP 项目：`php-project.mdc`
   - Kotlin 项目：`kotlin-project.mdc`
   - Java 项目：`java-project.mdc`
+  - React Native 项目：`react-native-project.mdc`
+  - React 项目：`react-project.mdc`
+  - Vue 项目：`vue-project.mdc`
+  - Next.js 项目：`nextjs-project.mdc`
+  - TypeScript 项目：`typescript-project.mdc`
+  - Node.js 项目：`nodejs-project.mdc`
+  - iOS 项目：`ios-project.mdc`
+  - Spring Boot 项目：`spring-boot-project.mdc`
 
 ## 项目规则文件位置
 
@@ -64,40 +71,76 @@ alwaysApply: true
 
 当项目根目录的 `.cursor/rules/` 目录不存在或为空时，按以下优先级自动检测项目类型：
 
-1. **Flutter 混合项目**：
-   - 检测条件：存在 `pubspec.yaml` 且存在 `android/` 目录
-   - 规则文件：`android-flutter-project.mdc`
-   - 项目规则文件名：`android-flutter-rules.mdc`
-
-2. **Flutter 项目**：
+1. **Flutter 项目**：
    - 检测条件：存在 `pubspec.yaml`
    - 规则文件：`flutter-project.mdc`
    - 项目规则文件名：`flutter-rules.mdc`
+   - 说明：Flutter 项目天然支持多平台（Android、iOS、Web 等），Platform Channel 相关内容已包含在规则中
 
-3. **Android 项目**：
+2. **Android 项目**：
    - 检测条件：存在 `settings.gradle` 或根目录 `build.gradle`，且不存在 `pubspec.yaml`
    - 规则文件：`android-project.mdc`
    - 项目规则文件名：`android-rules.mdc`
 
-4. **Python 项目**：
+3. **Python 项目**：
    - 检测条件：存在 `requirements.txt` 或 `pyproject.toml`
    - 规则文件：`python-project.mdc`
    - 项目规则文件名：`python-rules.mdc`
 
-5. **PHP 项目**：
+4. **PHP 项目**：
    - 检测条件：存在 `composer.json`
    - 规则文件：`php-project.mdc`
    - 项目规则文件名：`php-rules.mdc`
 
-6. **Kotlin 项目**：
+5. **Kotlin 项目**：
    - 检测条件：主要代码文件为 `.kt` 文件
    - 规则文件：`kotlin-project.mdc`
    - 项目规则文件名：`kotlin-rules.mdc`
 
-7. **Java 项目**：
+6. **Java 项目**：
    - 检测条件：主要代码文件为 `.java` 文件
    - 规则文件：`java-project.mdc`
    - 项目规则文件名：`java-rules.mdc`
+
+7. **React Native 项目**：
+   - 检测条件：存在 `package.json` 且依赖中包含 `react-native`
+   - 规则文件：`react-native-project.mdc`
+   - 项目规则文件名：`react-native-rules.mdc`
+
+8. **Next.js 项目**：
+   - 检测条件：存在 `package.json` 且依赖中包含 `next`，且存在 `next.config.js` 或 `next.config.ts`
+   - 规则文件：`nextjs-project.mdc`
+   - 项目规则文件名：`nextjs-rules.mdc`
+
+9. **React 项目**：
+    - 检测条件：存在 `package.json` 且依赖中包含 `react`，且不存在 `react-native` 和 `next`
+    - 规则文件：`react-project.mdc`
+    - 项目规则文件名：`react-rules.mdc`
+
+10. **Vue 项目**：
+    - 检测条件：存在 `package.json` 且依赖中包含 `vue`，且存在 `vue.config.js` 或 `vite.config.js`（Vue 3）
+    - 规则文件：`vue-project.mdc`
+    - 项目规则文件名：`vue-rules.mdc`
+
+11. **TypeScript 项目**：
+    - 检测条件：存在 `tsconfig.json`
+    - 规则文件：`typescript-project.mdc`
+    - 项目规则文件名：`typescript-rules.mdc`
+
+12. **Node.js 项目**：
+    - 检测条件：存在 `package.json` 且包含 `"type": "module"` 或 CommonJS 模块，且不是前端框架项目
+    - 规则文件：`nodejs-project.mdc`
+    - 项目规则文件名：`nodejs-rules.mdc`
+
+13. **Spring Boot 项目**：
+    - 检测条件：存在 `pom.xml`（Maven）且包含 `spring-boot-starter-parent`，或存在 `build.gradle`（Gradle）且包含 `spring-boot`
+    - 规则文件：`spring-boot-project.mdc`
+    - 项目规则文件名：`spring-boot-rules.mdc`
+
+14. **iOS 项目**：
+    - 检测条件：存在 `*.xcodeproj` 或 `*.xcworkspace` 文件，或存在 `Podfile`
+    - 规则文件：`ios-project.mdc`
+    - 项目规则文件名：`ios-rules.mdc`
 
 ### 用户手动指定
 
@@ -108,6 +151,10 @@ alwaysApply: true
   - "这是 Android 项目" / "这是一个 Android 项目"
   - "这是 Python 项目" / "这是一个 Python 项目"
   - "这是 PHP 项目" / "这是一个 PHP 项目"
+  - "这是 React 项目" / "这是 React Native 项目"
+  - "这是 Vue 项目" / "这是 Next.js 项目"
+  - "这是 TypeScript 项目" / "这是 Node.js 项目"
+  - "这是 iOS 项目" / "这是 Spring Boot 项目"
   - 其他类似表述
 
 - **处理逻辑**：
@@ -121,13 +168,20 @@ alwaysApply: true
 
 | 规则文件夹中的文件名 | 项目中的文件名 |
 |---------------------|---------------|
-| `android-flutter-project.mdc` | `android-flutter-rules.mdc` |
 | `flutter-project.mdc` | `flutter-rules.mdc` |
 | `android-project.mdc` | `android-rules.mdc` |
 | `python-project.mdc` | `python-rules.mdc` |
 | `php-project.mdc` | `php-rules.mdc` |
 | `kotlin-project.mdc` | `kotlin-rules.mdc` |
 | `java-project.mdc` | `java-rules.mdc` |
+| `react-native-project.mdc` | `react-native-rules.mdc` |
+| `react-project.mdc` | `react-rules.mdc` |
+| `vue-project.mdc` | `vue-rules.mdc` |
+| `nextjs-project.mdc` | `nextjs-rules.mdc` |
+| `typescript-project.mdc` | `typescript-rules.mdc` |
+| `nodejs-project.mdc` | `nodejs-rules.mdc` |
+| `ios-project.mdc` | `ios-rules.mdc` |
+| `spring-boot-project.mdc` | `spring-boot-rules.mdc` |
 
 ## 自动管理流程
 

@@ -1,0 +1,149 @@
+---
+alwaysApply: true
+---
+
+# iOS 项目规则
+
+> 适用于 iOS 原生应用开发项目
+
+## 项目类型
+- **项目类型**：iOS 原生项目
+- **主要语言**：Swift 优先，Objective-C 按需使用
+- **框架**：UIKit、SwiftUI 等
+
+## 代码风格
+
+### 命名规范
+- **类名**：PascalCase（如 `UserRepository`、`MainViewController`）
+- **方法/变量**：camelCase（如 `fetchUserData()`、`userName`）
+- **常量**：UPPER_SNAKE_CASE（如 `MAX_RETRY_COUNT`）
+- **私有成员**：以下划线开头（如 `_privateMethod()`）
+
+### UI 布局
+- SwiftUI：使用声明式 UI 布局
+- UIKit：使用 Storyboard、XIB 或代码布局
+- 使用 Auto Layout 实现响应式布局
+- 考虑不同屏幕尺寸和方向
+
+### 架构模式
+- **架构**：MVVM 或简单的 MVC 模式
+- 业务逻辑与 UI 分离
+- ViewModel 处理业务逻辑
+- Model 使用结构体（struct）或类（class）
+
+### 异步处理
+- 使用 async/await（Swift 5.5+）
+- 使用 DispatchQueue 处理后台任务
+- 使用 Combine 处理响应式编程（可选）
+
+## 依赖管理
+
+### 包管理器
+- **Swift Package Manager**：推荐使用
+- **CocoaPods**：传统方式，按需使用
+- **Carthage**：按需使用
+
+### 常用库
+- **网络请求**：URLSession、Alamofire
+- **图片加载**：Kingfisher、SDWebImage
+- **数据库**：Core Data、Realm、SQLite
+- **依赖注入**：Swinject（如需要）
+
+## 代码组织
+
+### 目录结构
+```
+ProjectName/
+├── App/
+│   ├── AppDelegate.swift
+│   └── SceneDelegate.swift
+├── Views/
+│   ├── Home/
+│   │   ├── HomeView.swift
+│   │   └── HomeViewModel.swift
+│   └── Profile/
+├── Models/
+│   └── User.swift
+├── Services/
+│   └── NetworkService.swift
+├── Utils/
+│   └── Extensions.swift
+└── Resources/
+    └── Assets.xcassets
+```
+
+### 文件组织
+- 按功能模块组织代码
+- 每个功能模块包含 View、ViewModel、Model
+- 共享代码放在 Utils 或 Common 目录
+
+## 错误处理
+
+### 异常处理
+- 使用 do-catch 捕获错误
+- 关键操作需要错误处理
+- 定义自定义错误类型
+- 提供有意义的错误信息
+
+### 可选类型
+- 合理使用可选类型（Optional）
+- 使用可选绑定（if let、guard let）
+- 使用可选链（optional chaining）
+
+## 性能优化
+
+### 性能要求
+- 一般即可，不需要极致优化
+- 避免明显的性能问题
+- 保持代码可维护性
+
+### 优化建议
+- 使用值类型（struct）减少引用计数开销
+- 图片缓存和懒加载
+- 列表使用 cell 复用
+- 避免主线程阻塞
+
+## 国际化
+
+### 当前需求
+- 暂不需要国际化
+- 预留空间：代码设计时尽量给国际化留出实现空间
+- 字符串资源：使用 Localizable.strings，避免硬编码
+
+## Git 工作流
+
+### 文件管理
+- 新创建的文件自动添加到 Git
+- 修改的文件自动添加到 Git
+- 忽略 `DerivedData/`、`*.xcuserstate` 等
+
+### .gitignore
+```
+# Xcode
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+*.xcworkspace/*
+!*.xcworkspace/contents.xcworkspacedata
+*.xcuserstate
+*.xcuserdatad
+DerivedData/
+build/
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+```
+
+## 其他规范
+
+### 代码质量
+- 保持代码简洁、易读
+- 避免过度设计
+- 单一职责原则
+- 遵循 Swift API 设计指南
+
+### 测试
+- 关键业务逻辑需要测试
+- 使用 XCTest 框架
+- 单元测试和 UI 测试（根据项目需要）

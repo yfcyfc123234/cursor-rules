@@ -30,9 +30,16 @@ alwaysApply: true
 
 - **拉取方式**：根据项目类型自动检测或用户明确指定
 - **项目类型映射**：
-  - Flutter 混合项目 → `android-flutter-project.mdc`
-  - Flutter 项目 → `flutter-project.mdc`
+  - Flutter 项目 → `flutter-project.mdc`（支持多平台，包含 Platform Channel 相关内容）
   - Android 项目 → `android-project.mdc`
+  - React Native 项目 → `react-native-project.mdc`
+  - iOS 项目 → `ios-project.mdc`
+  - React 项目 → `react-project.mdc`
+  - Vue 项目 → `vue-project.mdc`
+  - Next.js 项目 → `nextjs-project.mdc`
+  - TypeScript 项目 → `typescript-project.mdc`
+  - Node.js 项目 → `nodejs-project.mdc`
+  - Spring Boot 项目 → `spring-boot-project.mdc`
   - Python 项目 → `python-project.mdc`
   - PHP 项目 → `php-project.mdc`
   - Kotlin 项目 → `kotlin-project.mdc`

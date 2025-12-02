@@ -1,0 +1,187 @@
+---
+alwaysApply: true
+---
+
+# Node.js 项目规则
+
+> 适用于 Node.js 后端开发和全栈项目
+
+## 项目类型
+- **项目类型**：Node.js 项目
+- **主要语言**：JavaScript/TypeScript
+- **运行时**：Node.js
+
+## 代码风格
+
+### 命名规范
+- **类名**：PascalCase（如 `UserService`、`DatabaseConnection`）
+- **方法/变量**：camelCase（如 `fetchUserData()`、`userName`）
+- **常量**：UPPER_SNAKE_CASE（如 `MAX_RETRY_COUNT`、`API_BASE_URL`）
+- **文件名**：使用 kebab-case（如 `user-service.js`）
+
+### 代码规范
+- 遵循 Node.js 代码规范
+- 使用 ESLint 和 Prettier 保持代码风格统一
+- 使用严格模式（`'use strict'`）
+
+### 模块系统
+- 使用 ES Modules（`import/export`）或 CommonJS（`require/module.exports`）
+- 优先使用 ES Modules（Node.js 14+）
+- 避免混用两种模块系统
+
+## 架构模式
+
+### 代码组织
+- 使用 MVC 或简单的分层架构
+- 业务逻辑与路由分离
+- 使用服务层处理业务逻辑
+- 保持代码简洁，避免过度设计
+
+### 目录结构
+```
+src/
+├── routes/           # 路由定义
+│   ├── users.js
+│   └── posts.js
+├── controllers/      # 控制器
+├── services/         # 业务逻辑服务
+├── models/           # 数据模型
+├── middleware/       # 中间件
+├── utils/            # 工具函数
+├── config/           # 配置文件
+└── app.js            # 应用入口
+```
+
+## 依赖管理
+
+### package.json
+- 明确 Node.js 版本要求（使用 `engines` 字段）
+- 区分开发依赖和生产依赖
+- 使用精确版本或版本范围
+- 定期更新依赖版本，注意安全性
+
+### 常用库
+- **Web 框架**：Express、Koa、Fastify 等（根据项目选择）
+- **数据库**：根据项目选择（MongoDB、PostgreSQL、MySQL 等）
+- **ORM/ODM**：Sequelize、TypeORM、Mongoose 等
+- **验证**：Joi、Yup、Zod 等
+- **日志**：Winston、Pino 等
+
+## 错误处理
+
+### 异常处理
+- 使用 try-catch 捕获异常
+- 关键操作需要错误处理
+- 使用全局错误处理中间件
+- 提供有意义的错误信息和状态码
+
+### 错误响应
+- 统一的错误响应格式
+- 区分客户端错误（4xx）和服务器错误（5xx）
+- 生产环境不暴露敏感错误信息
+
+### 日志记录
+- 使用专业的日志库记录日志
+- 关键操作记录日志
+- 使用合适的日志级别（error、warn、info、debug）
+- 日志格式统一，便于分析和排查
+
+## 异步处理
+
+### Promise 和 async/await
+- 优先使用 async/await
+- 使用 Promise 处理异步操作
+- 注意异步操作的错误处理
+- 避免回调地狱
+
+### 并发控制
+- 使用 Promise.all 处理并行请求
+- 注意并发数量限制
+- 使用队列处理大量任务
+
+## 安全性
+
+### 安全实践
+- 验证和清理用户输入
+- 使用参数化查询防止 SQL 注入
+- 使用环境变量管理敏感信息
+- 实现身份验证和授权
+- 使用 HTTPS
+- 设置安全响应头
+
+### 环境变量
+- 使用 `.env` 文件管理环境变量（开发环境）
+- 生产环境使用安全的配置管理
+- 不要将敏感信息提交到 Git
+
+## 性能优化
+
+### 性能要求
+- 一般即可，不需要极致优化
+- 避免明显的性能问题
+- 保持代码可维护性
+
+### 优化建议
+- 使用连接池管理数据库连接
+- 实现缓存机制（Redis 等）
+- 使用压缩中间件
+- 合理使用异步操作
+- 监控和日志分析
+
+## API 设计
+
+### RESTful API
+- 遵循 RESTful 设计原则
+- 使用合适的 HTTP 方法（GET、POST、PUT、DELETE）
+- 统一的响应格式
+- 合理的状态码使用
+
+### API 文档
+- 使用 Swagger/OpenAPI 文档
+- API 接口说明清晰
+- 请求和响应示例
+
+## 测试
+
+### 测试策略
+- 关键业务逻辑需要测试
+- 使用单元测试和集成测试
+- 使用 Jest、Mocha 等测试框架
+- API 端点测试（根据项目需要）
+
+## Git 工作流
+
+### 文件管理
+- 新创建的文件自动添加到 Git
+- 修改的文件自动添加到 Git
+- 忽略 `node_modules/`、`dist/`、`.env` 等
+
+### .gitignore
+```
+node_modules/
+dist/
+build/
+.env
+.env.local
+.DS_Store
+*.log
+logs/
+```
+
+## 其他规范
+
+### 代码质量
+- 保持代码简洁、易读
+- 避免过度设计
+- 单一职责原则
+- 函数长度适中
+
+### 文档
+- README.md 说明项目用途和运行方法
+- API 文档说明接口使用方法
+- 关键函数添加注释
+
+### 部署
+- 使用 PM2、Docker 等工具部署
+- 配置健康检查
+- 日志和监控

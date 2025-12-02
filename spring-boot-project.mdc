@@ -1,0 +1,177 @@
+---
+alwaysApply: true
+---
+
+# Spring Boot 项目规则
+
+> 适用于 Spring Boot Java 后端开发项目
+
+## 项目类型
+- **项目类型**：Spring Boot 项目
+- **主要语言**：Java 或 Kotlin
+- **框架版本**：遵循项目指定的 Spring Boot 版本
+
+## 代码风格
+
+### 命名规范
+- **类名**：PascalCase（如 `UserService`、`UserController`）
+- **方法/变量**：camelCase（如 `getUserById()`、`userName`）
+- **常量**：UPPER_SNAKE_CASE（如 `MAX_RETRY_COUNT`）
+- **包名**：小写，使用反向域名（如 `com.example.app`）
+
+### 代码规范
+- 遵循 Java 代码规范
+- 使用 Spring 推荐的代码组织方式
+- 使用 Lombok 简化样板代码（可选）
+
+## 架构模式
+
+### 分层架构
+- **Controller 层**：处理 HTTP 请求和响应
+- **Service 层**：业务逻辑处理
+- **Repository 层**：数据访问
+- **Entity/DTO 层**：数据模型和传输对象
+
+### 目录结构
+```
+src/main/java/com/example/app/
+├── controller/        # Controller 层
+│   └── UserController.java
+├── service/          # Service 层
+│   └── UserService.java
+├── repository/       # Repository 层
+│   └── UserRepository.java
+├── entity/           # 实体类
+│   └── User.java
+├── dto/              # DTO 类
+│   └── UserDTO.java
+├── config/           # 配置类
+└── Application.java  # 主应用类
+```
+
+## 依赖管理
+
+### Maven 或 Gradle
+- 使用 Maven 或 Gradle 管理依赖
+- 明确 Spring Boot 版本
+- 使用 Spring Boot Starter 简化依赖管理
+
+### 常用依赖
+- **Web**：spring-boot-starter-web
+- **数据访问**：spring-boot-starter-data-jpa、spring-boot-starter-jdbc
+- **数据库**：MySQL、PostgreSQL、H2 等
+- **验证**：spring-boot-starter-validation
+- **安全**：spring-boot-starter-security（如需要）
+
+## 代码组织
+
+### Controller
+- 使用 `@RestController` 或 `@Controller`
+- 使用 `@RequestMapping` 定义基础路径
+- 方法使用 `@GetMapping`、`@PostMapping` 等
+- 参数使用 `@RequestBody`、`@PathVariable`、`@RequestParam`
+
+### Service
+- 使用 `@Service` 注解
+- 业务逻辑封装在 Service 层
+- 接口和实现分离（可选）
+
+### Repository
+- 使用 Spring Data JPA
+- 继承 `JpaRepository` 或自定义 Repository
+- 使用 `@Query` 编写自定义查询
+
+## 错误处理
+
+### 异常处理
+- 使用全局异常处理器（`@ControllerAdvice`）
+- 定义自定义异常类
+- 返回统一的错误响应格式
+- 使用合适的 HTTP 状态码
+
+### 日志记录
+- 使用 SLF4J + Logback（Spring Boot 默认）
+- 关键操作记录日志
+- 使用合适的日志级别（ERROR、WARN、INFO、DEBUG）
+
+## 配置管理
+
+### 配置文件
+- 使用 `application.properties` 或 `application.yml`
+- 使用 `@ConfigurationProperties` 绑定配置
+- 区分开发、测试、生产环境配置
+
+### 环境变量
+- 使用环境变量管理敏感信息
+- 不要将敏感信息提交到 Git
+
+## 数据库
+
+### JPA
+- 使用 JPA 进行数据访问
+- Entity 类使用 `@Entity` 注解
+- 使用 `@Id`、`@GeneratedValue` 定义主键
+- 使用关系注解（`@OneToMany`、`@ManyToOne` 等）
+
+### 事务管理
+- 使用 `@Transactional` 管理事务
+- Service 层方法添加事务注解
+- 注意事务传播行为
+
+## 性能优化
+
+### 性能要求
+- 一般即可，不需要极致优化
+- 避免明显的性能问题
+- 保持代码可维护性
+
+### 优化建议
+- 使用连接池管理数据库连接
+- 实现缓存机制（Redis、Caffeine）
+- 使用分页查询避免大数据量查询
+- 合理使用异步处理
+
+## API 设计
+
+### RESTful API
+- 遵循 RESTful 设计原则
+- 使用合适的 HTTP 方法（GET、POST、PUT、DELETE）
+- 统一的响应格式
+- 合理的状态码使用
+
+### API 文档
+- 使用 Swagger/OpenAPI 文档
+- 使用 `springdoc-openapi` 生成 API 文档
+- API 接口说明清晰
+
+## Git 工作流
+
+### 文件管理
+- 新创建的文件自动添加到 Git
+- 修改的文件自动添加到 Git
+- 忽略 `target/`、`build/`、`.idea/` 等
+
+### .gitignore
+```
+target/
+build/
+.idea/
+*.iml
+.DS_Store
+*.log
+*.class
+```
+
+## 其他规范
+
+### 代码质量
+- 保持代码简洁、易读
+- 避免过度设计
+- 单一职责原则
+- 使用 Spring 的特性简化代码
+
+### 测试
+- 关键业务逻辑需要测试
+- 使用 JUnit 和 Mockito 进行单元测试
+- 使用 `@SpringBootTest` 进行集成测试
+- API 端点测试（根据项目需要）

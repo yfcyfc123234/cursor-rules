@@ -4,12 +4,13 @@ alwaysApply: true
 
 # Flutter 项目规则
 
-> 适用于纯 Flutter 项目
+> 适用于 Flutter 项目（支持多平台：Android、iOS、Web、桌面等）
 
 ## 项目类型
 - **项目类型**：Flutter 项目
 - **主要语言**：Dart
 - **框架版本**：遵循项目指定的 Flutter SDK 版本
+- **平台支持**：Flutter 项目天然支持多平台（Android、iOS、Web、Windows、macOS、Linux 等）
 
 ## 代码风格
 
@@ -77,6 +78,7 @@ lib/
 
 ### 版本兼容
 - Flutter SDK 版本统一管理
+- Platform Channel 的原生代码需要版本兼容（如需要）
 - 第三方插件的最低版本要求
 - 注意 API 兼容性
 
@@ -112,6 +114,46 @@ lib/
 - 合理使用 const 构造函数
 - 图片资源优化（压缩、使用合适的格式）
 
-### Platform Channel
-- 如需要与原生代码交互，确保接口设计清晰
-- Platform Channel 调用需要错误处理
+### 多平台支持
+
+Flutter 项目天然支持多平台，`android/`、`ios/`、`web/` 等目录是自动生成的平台代码。
+
+- **纯 Flutter 项目**：主要编写 Dart 代码，很少修改原生代码
+- **平台特定代码**：仅在必要时修改原生代码（如添加原生插件、自定义原生功能）
+- 考虑不同平台的适配和兼容性
+
+### Platform Channel（原生交互）
+
+如需要与原生代码交互（Android/iOS）：
+
+#### 接口设计
+- Method Channel 用于方法调用
+- Event Channel 用于事件流
+- 方法命名清晰（如 `getDeviceInfo`、`saveFile`）
+- 参数使用 Map 或标准数据类型
+
+#### 错误处理
+- Android/iOS 端必须处理异常并返回给 Flutter
+- Flutter 端需要处理可能的方法调用失败
+- 提供友好的错误信息
+- Platform Channel 调用必须包含错误处理
+
+#### 版本兼容
+- Platform Channel 的原生代码需要版本兼容
+- 考虑不同 Android/iOS 版本的 API 差异
+- 测试不同版本的兼容性
+
+#### Android 原生代码（如需要）
+- **命名规范**：PascalCase（类名）、camelCase（方法/变量）
+- **架构**：简单 MVC 模式即可，主要用于 Platform Channel 交互
+- **依赖管理**：在 `android/app/build.gradle` 中管理，注意与 Flutter 插件的依赖冲突
+
+#### 原生代码组织（如需要）
+```
+android/app/src/main/
+├── kotlin/.../android/
+│   └── MainActivity.kt       # 主入口
+├── kotlin/.../platform/
+│   └── PlatformChannel.kt    # Platform Channel 处理
+└── res/
+```
