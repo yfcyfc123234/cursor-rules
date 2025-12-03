@@ -26,6 +26,8 @@ alwaysApply: true
   - 其他 `common-rules/` 目录下的 `.mdc` 文件
 - **排除文件**：`github-rules-sync.mdc`（避免循环拉取）
 
+**重要说明**：可选规则（`optional-project-rules/` 目录）**不会自动拉取**，需要用户明确要求才拉取。
+
 ### 项目规则
 
 - **拉取方式**：根据项目类型自动检测或用户明确指定
