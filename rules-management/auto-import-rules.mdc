@@ -6,6 +6,24 @@ alwaysApply: true
 
 > 定义规则自动导入的完整流程，整合 GitHub 拉取和本地缓存逻辑，支持自动检测和手动触发
 
+## ⚠️ 重要：执行方式要求
+
+**AI 在执行规则导入时，必须使用文件操作工具，禁止手写生成规则内容：**
+
+1. **从本地缓存复制**：
+   - ✅ 使用 `read_file` 读取源文件 → 使用 `write` 写入目标文件
+   - ❌ **禁止**一行一行地手写规则内容
+
+2. **从 GitHub 下载**：
+   - ✅ 使用 `run_terminal_cmd` 执行 `curl` 命令下载 → 使用 `write` 保存
+   - ✅ 或使用 `read_file` 直接读取 GitHub Raw URL（如果支持）→ 使用 `write` 保存
+   - ❌ **禁止**一行一行地手写规则内容
+
+3. **原则**：
+   - 规则文件是**复制**或**下载**，不是**生成**
+   - 必须保持原始文件内容完全一致
+   - 只允许添加或修复 frontmatter（如果缺失）
+
 ## 触发机制
 
 ### 自动触发
@@ -210,25 +228,54 @@ alwaysApply: true
 
 ## 规则文件导入流程
 
+**重要：执行方式说明**
+
+在执行规则导入时，**必须使用文件操作工具**，而不是手写生成规则内容：
+
+1. **从本地缓存拉取**：
+   - 使用 `read_file` 工具读取源文件（如 `C:\Users\Administrator\Desktop\cursor-rules\common-project-rules\user-base-rule.mdc`）
+   - 使用 `write` 工具将读取的内容写入目标文件（如 `.cursor/rules/user-base-rule.mdc`）
+   - **禁止**：一行一行地手写规则内容
+
+2. **从 GitHub 拉取**：
+   - 使用 `run_terminal_cmd` 执行 `curl` 命令下载文件，或
+   - 使用 `read_file` 工具直接读取 GitHub Raw Content URL（如果支持）
+   - 然后使用 `write` 工具保存到目标位置
+   - **禁止**：一行一行地手写规则内容
+
+3. **文件复制原则**：
+   - 规则文件是**复制**或**下载**，不是**生成**
+   - 必须保持原始文件内容完全一致
+   - 只允许添加或修复 frontmatter（如果缺失）
+
 ### 步骤 1：拉取基础规则
 
-从 `common-project-rules/` 目录拉取基础规则文件（所有项目都需要）：
+**⚠️ 重要：必须导入 `common-project-rules/` 目录下的所有 `.mdc` 文件**
 
-- `user-base-rule.mdc` - 用户基础规则
-- `git-automation.mdc` - Git 自动化规则
-- `ui-design-reconstruction.mdc` - UI 设计图还原规则
-- `batch-file-operations.mdc` - 批量文件操作优化规则
-- `hardware-limitations.mdc` - 硬件限制规则
-- `documentation-format.mdc` - 文档格式规范
+从 `common-project-rules/` 目录拉取**所有**基础规则文件（所有项目都需要）：
+
+**执行方式**：
+1. **使用 `list_dir` 工具扫描 `common-project-rules/` 目录**，获取所有 `.mdc` 文件列表
+2. **必须导入目录下的所有 `.mdc` 文件**，不能遗漏任何文件
+3. **禁止使用硬编码的文件列表**，必须动态获取完整文件列表
 
 **排除目录**：
 - `rules-management/` - 规则导入/管理类文件，只用于 AI 分析如何导入规则，不导入到用户项目
 - `optional-project-rules/` - 可选规则，不会自动导入
 
 **重要说明**：
-- **基础规则（`common-project-rules/`）**：**自动导入**，所有项目都需要
+- **基础规则（`common-project-rules/`）**：**必须全部自动导入**，所有项目都需要，不能遗漏任何文件
 - **规则管理文件（`rules-management/`）**：**不导入到用户项目**，只用于 AI 分析如何导入规则
 - **可选规则（`optional-project-rules/`）**：**不会自动导入**，需要用户明确要求或 AI 智能分析推荐
+
+**当前 `common-project-rules/` 目录包含的文件（仅供参考，实际必须动态获取）**：
+- `user-base-rule.mdc` - 用户基础规则
+- `git-automation.mdc` - Git 自动化规则
+- `ui-design-reconstruction.mdc` - UI 设计图还原规则
+- `batch-file-operations.mdc` - 批量文件操作优化规则
+- `hardware-limitations.mdc` - 硬件限制规则
+- `documentation-format.mdc` - 文档格式规范
+- 以及其他所有 `.mdc` 文件（必须动态获取完整列表）
 
 ### 步骤 2：智能分析可选规则（可选）
 
@@ -297,47 +344,71 @@ alwaysApply: true
 
 1. **创建目录**
    - 在项目根目录创建 `.cursor/rules/` 目录（如果不存在）
+   - 使用 `list_dir` 检查目录是否存在，不存在则创建
 
-2. **保存文件**
-   - 将所有成功拉取的文件保存到 `.cursor/rules/` 目录
+2. **获取需要导入的文件列表（关键步骤）**
+   - **必须使用 `list_dir` 工具扫描 `common-project-rules/` 目录**，获取所有 `.mdc` 文件
+   - **禁止使用硬编码的文件列表**
+   - 遍历获取到的所有 `.mdc` 文件，逐个导入
+   - 确保不遗漏任何文件
+
+3. **保存文件（关键步骤）**
+   - **从本地缓存拉取时**：
+     - 对于 `list_dir` 获取的每个 `.mdc` 文件：
+       - 使用 `read_file` 工具读取源文件（如 `C:\Users\Administrator\Desktop\cursor-rules\common-project-rules\{文件名}.mdc`）
+       - 使用 `write` 工具将读取的内容写入目标文件（如 `.cursor/rules/{文件名}.mdc`）
+     - **禁止手写生成内容**
+     - **必须导入所有文件，不能遗漏**
+   
+   - **从 GitHub 拉取时**：
+     - 对于 `list_dir` 获取的每个 `.mdc` 文件：
+       - 使用 `run_terminal_cmd` 执行 `curl` 命令下载文件内容，例如：
+         ```bash
+         curl -L "https://raw.githubusercontent.com/{owner}/{repo}/{branch}/common-project-rules/{文件名}.mdc"
+         ```
+       - 或者使用 `read_file` 工具直接读取 GitHub Raw Content URL（如果 Cursor 支持）
+       - 将获取的内容使用 `write` 工具保存到目标文件
+     - **禁止手写生成内容**
+     - **必须导入所有文件，不能遗漏**
+   
    - 使用确定的文件名
    - 确保文件内容完整，包含 frontmatter
+   - **重要**：必须保持原始文件内容完全一致，只允许添加或修复 frontmatter（如果缺失）
 
 3. **验证保存结果**
-   - 检查文件是否成功保存
-   - 验证文件内容是否正确
+   - 使用 `read_file` 检查文件是否成功保存
+   - 验证文件内容是否正确（包含 frontmatter，内容完整）
 
 ### 步骤 7：完成提示
 
 成功导入所有规则文件后，提示用户：
 
+**必须显示实际导入的文件列表**（使用 `list_dir` 获取 `.cursor/rules/` 目录下的文件列表）：
+
 ```
 ✅ 已成功导入规则文件到 `.cursor/rules/` 目录：
 
-基础规则：
-- user-base-rule.mdc
-- git-automation.mdc
-- ui-design-reconstruction.mdc
-- batch-file-operations.mdc
-- hardware-limitations.mdc
-- documentation-format.mdc
+基础规则（`common-project-rules/` 目录下的所有文件）：
+- {实际导入的文件1}.mdc ({文件大小})
+- {实际导入的文件2}.mdc ({文件大小})
+- {实际导入的文件3}.mdc ({文件大小})
+...（列出所有实际导入的基础规则文件）
 
 项目特定规则：
-- {项目规则文件名}.mdc
+- {项目规则文件名}.mdc ({文件大小})
 
 **注意**：`rules-management/` 目录中的文件不会导入到用户项目，只用于 AI 分析如何导入规则。
-
-项目规则：
-- {项目规则文件名}.mdc
 
 所有规则已生效，可以开始使用。
 
 💡 提示：
-- **通用规则**（`common-project-rules/`）：已自动导入，适用于所有项目
+- **通用规则**（`common-project-rules/`）：已自动导入所有文件，适用于所有项目
 - **可选规则**（`optional-project-rules/`）：未自动导入，需要用户明确要求或 AI 智能分析推荐
   - 如需使用可选规则（如开发日志自动管理），请明确要求导入
   - 或 AI 会根据项目特征智能分析并推荐是否需要导入
 ```
+
+**重要**：完成提示中必须显示**实际导入的文件列表**，不能使用占位符或示例列表。
 
 ## 错误处理
 

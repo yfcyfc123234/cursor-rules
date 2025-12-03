@@ -42,6 +42,10 @@ alwaysApply: true
      - AI 根据项目类型自动拉取所有需要的规则文件
      - 包括基础规则（如 `user-base-rule.mdc`、`git-automation.mdc` 等）
      - 以及项目特定规则（如 `flutter-project.mdc`、`android-project.mdc` 等）
+   - **执行方式（重要）**：
+     - **从本地缓存拉取**：使用 `read_file` 读取源文件，然后使用 `write` 写入目标文件
+     - **从 GitHub 拉取**：使用 `run_terminal_cmd` 执行 `curl` 命令下载，然后使用 `write` 保存
+     - **禁止**：一行一行地手写生成规则内容，必须复制或下载原始文件内容
 
 4. **导入到项目**
    - 将所有规则文件保存到项目的 `.cursor/rules/` 目录

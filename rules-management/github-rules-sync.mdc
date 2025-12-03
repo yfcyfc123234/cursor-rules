@@ -4,6 +4,21 @@ alwaysApply: true
 
 # GitHub 规则自动拉取
 
+## ⚠️ 重要：执行方式要求
+
+**AI 在执行 GitHub 规则拉取时，必须使用命令行工具或文件读取工具，禁止手写生成规则内容：**
+
+1. **从 GitHub 下载文件**：
+   - ✅ 使用 `run_terminal_cmd` 执行 `curl -L "{url}"` 命令下载文件内容
+   - ✅ 或使用 `read_file` 直接读取 GitHub Raw Content URL（如果 Cursor 支持）
+   - ✅ 将获取的内容使用 `write` 工具保存到目标文件
+   - ❌ **禁止**一行一行地手写规则内容
+
+2. **原则**：
+   - 规则文件是**下载**，不是**生成**
+   - 必须保持原始文件内容完全一致
+   - 只允许添加或修复 frontmatter（如果缺失）
+
 ## GitHub 仓库配置
 
 - **仓库地址**：`https://github.com/yfcyfc123234/cursor-rules`
@@ -17,23 +32,30 @@ alwaysApply: true
 
 ### 通用规则
 
-- **拉取目录**：`common-project-rules/` 目录下的所有 `.mdc` 文件
-- **需要拉取的文件**：
-  - `user-base-rule.mdc`
-  - `git-automation.mdc`
-  - `batch-file-operations.mdc`
-  - `hardware-limitations.mdc`
-  - `documentation-format.mdc`
-  - `ui-design-reconstruction.mdc`
-  - 其他 `common-project-rules/` 目录下的 `.mdc` 文件
+**⚠️ 重要：必须拉取 `common-project-rules/` 目录下的所有 `.mdc` 文件**
+
+- **拉取目录**：`common-project-rules/` 目录下的**所有** `.mdc` 文件
+- **执行方式**：
+  - **必须使用 `list_dir` 工具扫描 `common-project-rules/` 目录**，获取所有 `.mdc` 文件列表
+  - **必须拉取目录下的所有 `.mdc` 文件**，不能遗漏任何文件
+  - **禁止使用硬编码的文件列表**，必须动态获取完整文件列表
 - **排除目录**：
   - `rules-management/` - 规则导入/管理类文件，只用于 AI 分析如何导入规则，不导入到用户项目
   - `optional-project-rules/` - 可选规则，不会自动拉取
 
 **重要说明**：
-- **通用规则（`common-project-rules/`）**：**自动拉取**，所有项目都需要
+- **通用规则（`common-project-rules/`）**：**必须全部自动拉取**，所有项目都需要，不能遗漏任何文件
 - **规则管理文件（`rules-management/`）**：**不拉取到用户项目**，只用于 AI 分析如何导入规则
 - **可选规则（`optional-project-rules/`）**：**不会自动拉取**，需要用户明确要求才拉取
+
+**当前 `common-project-rules/` 目录包含的文件（仅供参考，实际必须动态获取）**：
+- `user-base-rule.mdc` - 用户基础规则
+- `git-automation.mdc` - Git 自动化规则
+- `batch-file-operations.mdc` - 批量文件操作优化规则
+- `hardware-limitations.mdc` - 硬件限制规则
+- `documentation-format.mdc` - 文档格式规范
+- `ui-design-reconstruction.mdc` - UI 设计图还原规则
+- 以及其他所有 `.mdc` 文件（必须动态获取完整列表）
 
 ### 项目规则
 
@@ -140,19 +162,52 @@ alwaysApply: true
 
 ### 步骤 4：从 GitHub 拉取文件
 
+**重要：执行方式说明**
+
+从 GitHub 拉取文件时，**必须使用命令行工具或文件读取工具**，而不是手写生成规则内容：
+
+1. **使用 `run_terminal_cmd` 执行 `curl` 命令**：
+   - 构建完整的 Raw Content URL
+   - 使用 `curl -L` 命令下载文件内容
+   - 将下载的内容保存到临时变量或直接写入目标文件
+   - **禁止**：一行一行地手写规则内容
+
+2. **或使用 `read_file` 工具（如果 Cursor 支持直接读取 URL）**：
+   - 直接使用 `read_file` 工具读取 GitHub Raw Content URL
+   - 然后使用 `write` 工具保存到目标位置
+   - **禁止**：一行一行地手写规则内容
+
+3. **文件复制原则**：
+   - 规则文件是**下载**，不是**生成**
+   - 必须保持原始文件内容完全一致
+   - 只允许添加或修复 frontmatter（如果缺失）
+
 #### 4.1 拉取通用规则
 
-对于 `common-project-rules/` 目录下的每个 `.mdc` 文件（排除 `rules-management/` 目录）：
+**⚠️ 重要：必须拉取 `common-project-rules/` 目录下的所有 `.mdc` 文件**
 
-1. **构建文件 URL**：
-   ```
-   https://raw.githubusercontent.com/{owner}/{repo}/{branch}/common-project-rules/{filename}
-   ```
+1. **获取文件列表**：
+   - **必须使用 `list_dir` 工具扫描 `common-project-rules/` 目录**，获取所有 `.mdc` 文件列表
+   - **禁止使用硬编码的文件列表**
+   - 确保获取完整的文件列表，不遗漏任何文件
 
-2. **拉取文件内容**：
-   - 使用 HTTP GET 请求获取文件内容
+2. **遍历所有文件**：
+   对于 `list_dir` 获取的每个 `.mdc` 文件：
+
+   a. **构建文件 URL**：
+      ```
+      https://raw.githubusercontent.com/{owner}/{repo}/{branch}/common-project-rules/{filename}
+      ```
+
+   b. **拉取文件内容**：
+   - **使用 `run_terminal_cmd` 执行 `curl` 命令**：
+     ```bash
+     curl -L "https://raw.githubusercontent.com/{owner}/{repo}/{branch}/common-project-rules/{filename}"
+     ```
+   - 或者使用 `read_file` 工具直接读取 URL（如果支持）
    - 如果文件不存在（404 错误），跳过该文件并继续处理下一个
    - 如果网络错误，记录错误并继续尝试其他文件
+   - **禁止手写生成内容**
 
 3. **验证文件格式**：
    - 检查文件是否包含 frontmatter（`---\nalwaysApply: true\n---`）
@@ -175,9 +230,14 @@ alwaysApply: true
    ```
 
 3. **拉取文件内容**：
-   - 使用 HTTP GET 请求获取文件内容
+   - **使用 `run_terminal_cmd` 执行 `curl` 命令**：
+     ```bash
+     curl -L "https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{project-rule-filename}"
+     ```
+   - 或者使用 `read_file` 工具直接读取 URL（如果支持）
    - 如果文件不存在（404 错误），提示用户："⚠️ 未找到对应的项目规则文件 `{filename}`，跳过项目规则拉取。"
    - 如果网络错误，记录错误并提示用户
+   - **禁止手写生成内容**
 
 4. **验证文件格式**：
    - 检查文件是否包含 frontmatter
@@ -212,9 +272,13 @@ alwaysApply: true
    - 确保本地缓存目录存在（如果路径不存在，尝试创建目录）
 
 2. **保存到项目**：
-   - 将所有成功拉取的文件保存到项目的 `.cursor/rules/` 目录
+   - **使用 `write` 工具保存文件**：
+     - 将从 GitHub 下载的文件内容（通过 `curl` 获取）使用 `write` 工具保存到目标文件
+     - 或将从 `read_file` 读取的内容使用 `write` 工具保存到目标文件
+     - **禁止手写生成内容**
    - 使用步骤 5 确定的文件名
    - 确保文件内容完整，包含 frontmatter
+   - **重要**：必须保持原始文件内容完全一致，只允许添加或修复 frontmatter（如果缺失）
 
 3. **更新本地缓存**：
    - 从 GitHub 拉取成功后，同时更新本地缓存
@@ -303,21 +367,24 @@ alwaysApply: true
 
 成功拉取并保存所有文件后，提示用户：
 
+**必须显示实际导入的文件列表**（使用 `list_dir` 获取 `.cursor/rules/` 目录下的文件列表）：
+
 ```
 ✅ 已从 GitHub 仓库拉取规则文件：
 
-通用规则：
-- user-base-rule.mdc
-- git-automation.mdc
-- project-rules-auto-management.mdc
-- batch-file-operations.mdc
-[其他通用规则文件]
+通用规则（`common-project-rules/` 目录下的所有文件）：
+- {实际导入的文件1}.mdc ({文件大小})
+- {实际导入的文件2}.mdc ({文件大小})
+- {实际导入的文件3}.mdc ({文件大小})
+...（列出所有实际导入的通用规则文件）
 
 项目规则：
-- {项目规则文件名}.mdc
+- {项目规则文件名}.mdc ({文件大小})
 
 所有规则文件已保存到 `.cursor/rules/` 目录。
 ```
+
+**重要**：完成提示中必须显示**实际导入的文件列表**，不能使用占位符或示例列表。必须确保所有 `common-project-rules/` 目录下的文件都已导入。
 
 ## 错误处理
 

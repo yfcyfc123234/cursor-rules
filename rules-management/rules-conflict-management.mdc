@@ -286,12 +286,26 @@ alwaysApply: true
 
 ### 通用规则文件名识别
 
+**⚠️ 重要：必须使用 `list_dir` 动态获取 `common-project-rules/` 目录下的所有文件名**
+
 根据规则库中 `common-project-rules/` 目录下的文件名识别：
 
+**识别方式**：
+1. **使用 `list_dir` 工具扫描规则库的 `common-project-rules/` 目录**，获取所有 `.mdc` 文件名
+2. **项目中的规则文件**如果文件名匹配 `list_dir` 获取的任意文件名，则识别为通用规则文件
+3. **禁止使用硬编码的文件名列表**，必须动态获取
+
+**示例**（仅供参考，实际必须动态获取）：
 - `user-base-rule.mdc` → 对应规则库中的 `common-project-rules/user-base-rule.mdc`
 - `git-automation.mdc` → 对应规则库中的 `common-project-rules/git-automation.mdc`
-- `project-rules-auto-management.mdc` → 对应规则库中的 `rules-management/project-rules-auto-management.mdc`（不导入到用户项目）
-- 其他通用规则文件...
+- `batch-file-operations.mdc` → 对应规则库中的 `common-project-rules/batch-file-operations.mdc`
+- `hardware-limitations.mdc` → 对应规则库中的 `common-project-rules/hardware-limitations.mdc`
+- `documentation-format.mdc` → 对应规则库中的 `common-project-rules/documentation-format.mdc`
+- `ui-design-reconstruction.mdc` → 对应规则库中的 `common-project-rules/ui-design-reconstruction.mdc`
+- 以及其他所有 `list_dir` 获取的文件名...
+
+**排除**：
+- `project-rules-auto-management.mdc` → 对应规则库中的 `rules-management/project-rules-auto-management.mdc`（不导入到用户项目，属于规则管理文件）
 
 ### 用户自定义规则识别
 
