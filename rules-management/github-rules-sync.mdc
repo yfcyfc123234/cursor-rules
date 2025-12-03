@@ -10,12 +10,13 @@ alwaysApply: true
 
 ### ❌ 绝对禁止的操作
 
-1. **禁止使用任何编辑工具生成规则内容**：
+1. **禁止使用 curl + write 方式**：
+   - ❌ **绝对禁止**使用 `curl` 下载后再用 `write` 写入（这会在界面显示文件内容，看起来像逐行处理）
+   - ❌ **绝对禁止**使用 `read_file` 读取 GitHub URL 后再用 `write` 写入
    - ❌ **绝对禁止**使用 `search_replace` 工具编辑规则文件
    - ❌ **绝对禁止**使用 `edit_file` 工具编辑规则文件
    - ❌ **绝对禁止**一行一行地手写生成规则内容
    - ❌ **绝对禁止**根据规则描述生成规则内容
-   - ❌ **绝对禁止**使用任何方式"创建"或"生成"规则文件内容
 
 2. **禁止的行为**：
    - ❌ 不能根据规则文件的描述来生成内容
@@ -25,28 +26,32 @@ alwaysApply: true
 
 ### ✅ 必须执行的操作
 
-1. **从 GitHub 下载规则文件**：
-   - ✅ **必须**使用 `run_terminal_cmd` 执行 `curl -L "{完整URL}"` 命令下载文件内容
-   - ✅ 或者使用 `read_file` 工具直接读取 GitHub Raw Content URL（如果 Cursor 支持）
-   - ✅ **必须**使用 `write` 工具将下载的**完整内容**保存到目标文件
+1. **从 GitHub 下载规则文件（必须使用 curl 的 -o 参数）**：
+   - ✅ **必须**使用 `run_terminal_cmd` 执行 `curl -L "{完整URL}" -o "{目标文件路径}"` 命令直接下载并保存文件：
+     ```bash
+     # 跨平台命令（Windows/Linux/Mac 都支持）
+     curl -L "https://raw.githubusercontent.com/{owner}/{repo}/{branch}/common-project-rules/user-base-rule.mdc" -o ".cursor/rules/user-base-rule.mdc"
+     ```
+   - ✅ **必须**使用 `-o` 参数直接保存到目标文件，不在界面显示文件内容
    - ✅ **必须**保持文件内容完全一致，不能修改任何内容（除了添加 frontmatter 如果缺失）
+   - ❌ **绝对禁止**使用 `curl` 下载后再用 `write` 写入（这会在界面显示文件内容）
 
 2. **执行流程**：
    ```
    步骤 1: 使用 list_dir 扫描源目录（或构建文件列表），获取所有 .mdc 文件列表
    步骤 2: 对于每个文件：
             - 构建完整的 GitHub Raw Content URL
-            - run_terminal_cmd(curl -L URL) → 获取完整文件内容
-            - write(目标文件路径, 下载的完整内容)
-   步骤 3: 验证文件是否成功保存（使用 read_file 检查目标文件）
+            - run_terminal_cmd(curl -L URL -o 目标路径) → 直接下载并保存文件
+   步骤 3: 验证文件是否成功保存（使用 list_dir 检查目标目录）
    ```
 
 ### ⚠️ 关键原则
 
-- **规则文件是下载，不是生成**
-- **必须使用文件操作工具（curl + write），不能使用编辑工具（search_replace、edit_file）**
+- **规则文件是直接下载，不是下载后写入**
+- **必须使用 curl 的 -o 参数直接保存，禁止使用 curl + write**
+- **必须注意跨平台兼容性，curl -o 在所有平台都支持**
 - **必须保持原始文件内容完全一致**
-- **只允许添加或修复 frontmatter（如果缺失）**
+- **不能在界面显示文件内容，避免看起来像逐行处理**
 
 ## GitHub 仓库配置
 
@@ -193,22 +198,18 @@ alwaysApply: true
 
 **重要：执行方式说明**
 
-从 GitHub 拉取文件时，**必须使用命令行工具或文件读取工具**，而不是手写生成规则内容：
+从 GitHub 拉取文件时，**必须使用 curl 的 -o 参数直接下载并保存**，而不是下载后写入：
 
-1. **使用 `run_terminal_cmd` 执行 `curl` 命令**：
+1. **使用 `run_terminal_cmd` 执行 `curl -L "{URL}" -o "{目标路径}"` 命令**：
    - 构建完整的 Raw Content URL
-   - 使用 `curl -L` 命令下载文件内容
-   - 将下载的内容保存到临时变量或直接写入目标文件
-   - **禁止**：一行一行地手写规则内容
+   - 使用 `curl -L "{URL}" -o "{目标路径}"` 命令直接下载并保存文件
+   - **跨平台命令**：`curl -L "URL" -o "目标路径"`（Windows/Linux/Mac 都支持）
+   - ❌ **绝对禁止**使用 `curl` 下载后再用 `write` 写入（会在界面显示文件内容）
 
-2. **或使用 `read_file` 工具（如果 Cursor 支持直接读取 URL）**：
-   - 直接使用 `read_file` 工具读取 GitHub Raw Content URL
-   - 然后使用 `write` 工具保存到目标位置
-   - **禁止**：一行一行地手写规则内容
-
-3. **文件复制原则**：
-   - 规则文件是**下载**，不是**生成**
+2. **文件复制原则**：
+   - 规则文件是**直接下载**，不是**下载后写入**
    - 必须保持原始文件内容完全一致
+   - 不能在界面显示文件内容，避免看起来像逐行处理
    - 只允许添加或修复 frontmatter（如果缺失）
 
 #### 4.1 拉取通用规则
@@ -229,12 +230,14 @@ alwaysApply: true
       ```
 
     b. **拉取文件内容**：
-     - ✅ **必须**使用 `run_terminal_cmd` 执行 `curl -L "{完整URL}"` 命令下载文件内容：
+     - ✅ **必须**使用 `run_terminal_cmd` 执行 `curl -L "{完整URL}" -o "{目标文件路径}"` 命令直接下载并保存：
        ```bash
-       curl -L "https://raw.githubusercontent.com/{owner}/{repo}/{branch}/common-project-rules/{filename}"
+       # 跨平台命令（Windows/Linux/Mac 都支持）
+       curl -L "https://raw.githubusercontent.com/{owner}/{repo}/{branch}/common-project-rules/{filename}" -o ".cursor/rules/{filename}"
        ```
-     - ✅ 或者使用 `read_file` 工具直接读取 URL（如果 Cursor 支持）
-     - ✅ **必须**将下载的**完整内容**使用 `write` 工具保存到目标文件
+     - ✅ **必须**使用 `-o` 参数直接保存到目标文件，不在界面显示文件内容
+     - ❌ **绝对禁止**使用 `curl` 下载后再用 `write` 写入（会在界面显示文件内容）
+     - ❌ **绝对禁止**使用 `read_file` + `write` 方式
      - ❌ **绝对禁止**使用 `search_replace`、`edit_file` 等编辑工具
      - ❌ **绝对禁止**手写生成内容
      - 如果文件不存在（404 错误），跳过该文件并继续处理下一个
@@ -261,14 +264,17 @@ alwaysApply: true
    ```
 
 3. **拉取文件内容**：
-   - **使用 `run_terminal_cmd` 执行 `curl` 命令**：
+   - ✅ **必须**使用 `run_terminal_cmd` 执行 `curl -L "{完整URL}" -o "{目标文件路径}"` 命令直接下载并保存：
      ```bash
-     curl -L "https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{project-rule-filename}"
+     # 跨平台命令（Windows/Linux/Mac 都支持）
+     curl -L "https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{project-rule-filename}" -o ".cursor/rules/{目标文件名}.mdc"
      ```
-   - 或者使用 `read_file` 工具直接读取 URL（如果支持）
+   - ✅ **必须**使用 `-o` 参数直接保存到目标文件，不在界面显示文件内容
+   - ❌ **绝对禁止**使用 `curl` 下载后再用 `write` 写入（会在界面显示文件内容）
+   - ❌ **绝对禁止**使用 `read_file` + `write` 方式
+   - ❌ **绝对禁止**手写生成内容
    - 如果文件不存在（404 错误），提示用户："⚠️ 未找到对应的项目规则文件 `{filename}`，跳过项目规则拉取。"
    - 如果网络错误，记录错误并提示用户
-   - **禁止手写生成内容**
 
 4. **验证文件格式**：
    - 检查文件是否包含 frontmatter
@@ -302,11 +308,16 @@ alwaysApply: true
    - 在项目根目录创建 `.cursor/rules/` 目录（如果不存在）
    - 确保本地缓存目录存在（如果路径不存在，尝试创建目录）
 
-2. **保存到项目**：
-   - **使用 `write` 工具保存文件**：
-     - 将从 GitHub 下载的文件内容（通过 `curl` 获取）使用 `write` 工具保存到目标文件
-     - 或将从 `read_file` 读取的内容使用 `write` 工具保存到目标文件
-     - **禁止手写生成内容**
+2. **保存到项目（必须使用 curl 的 -o 参数直接保存）**：
+   - ✅ **必须**使用 `run_terminal_cmd` 执行 `curl -L "{完整URL}" -o "{目标文件路径}"` 命令直接下载并保存：
+     ```bash
+     # 跨平台命令（Windows/Linux/Mac 都支持）
+     curl -L "https://raw.githubusercontent.com/{owner}/{repo}/{branch}/common-project-rules/{filename}" -o ".cursor/rules/{filename}"
+     ```
+   - ✅ **必须**使用 `-o` 参数直接保存到目标文件，不在界面显示文件内容
+   - ❌ **绝对禁止**使用 `curl` 下载后再用 `write` 写入（会在界面显示文件内容）
+   - ❌ **绝对禁止**使用 `read_file` + `write` 方式
+   - ❌ **绝对禁止**手写生成内容
    - 使用步骤 5 确定的文件名
    - 确保文件内容完整，包含 frontmatter
    - **重要**：必须保持原始文件内容完全一致，只允许添加或修复 frontmatter（如果缺失）
@@ -320,9 +331,9 @@ alwaysApply: true
      - 如果创建失败，记录错误但继续保存到项目
 
 4. **验证保存结果**：
-   - 检查文件是否成功保存到项目
-   - 检查文件是否成功保存到本地缓存（如果路径可用）
-   - 验证文件内容是否正确
+   - 使用 `list_dir` 检查目标目录，确认文件是否成功保存到项目
+   - 使用 `list_dir` 检查本地缓存目录，确认文件是否成功保存到本地缓存（如果路径可用）
+   - 验证文件是否存在（不需要读取文件内容）
 
 ### 降级策略：自动下载到本地缓存
 
@@ -346,15 +357,20 @@ alwaysApply: true
    - 尝试创建 `common-project-rules/` 子目录（如果不存在）
    - 如果创建失败，记录错误并继续尝试下载
 
-4. **下载规则文件**：
+4. **下载规则文件（必须使用 curl 的 -o 参数）**：
    - 从默认 GitHub 仓库下载所有通用规则文件到 `common-project-rules/` 目录
    - 下载项目规则文件到根目录
    - 使用 Raw Content URL：`https://raw.githubusercontent.com/yfcyfc123234/cursor-rules/main/`
    - 对于每个文件：
      - 构建完整的文件 URL
-     - 使用 HTTP GET 请求下载文件内容
-     - 验证文件内容（检查 frontmatter）
-     - 保存到本地缓存对应位置
+     - ✅ **必须**使用 `run_terminal_cmd` 执行 `curl -L "{完整URL}" -o "{目标文件路径}"` 命令直接下载并保存：
+       ```bash
+       # 跨平台命令（Windows/Linux/Mac 都支持）
+       curl -L "https://raw.githubusercontent.com/yfcyfc123234/cursor-rules/main/common-project-rules/{filename}" -o "{本地缓存路径}/common-project-rules/{filename}"
+       ```
+     - ✅ **必须**使用 `-o` 参数直接保存到目标文件，不在界面显示文件内容
+     - ❌ **绝对禁止**使用 `curl` 下载后再用 `write` 写入（会在界面显示文件内容）
+     - 验证文件是否存在（使用 `list_dir` 检查，不需要读取文件内容）
 
 5. **错误处理**：
    - **网络错误**：

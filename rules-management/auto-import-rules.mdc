@@ -12,12 +12,12 @@ alwaysApply: true
 
 ### ❌ 绝对禁止的操作
 
-1. **禁止使用任何编辑工具生成规则内容**：
+1. **禁止使用 read_file + write 方式**：
+   - ❌ **绝对禁止**使用 `read_file` 读取文件内容后再用 `write` 写入（这会在界面显示大量内容，看起来像逐行处理）
    - ❌ **绝对禁止**使用 `search_replace` 工具编辑规则文件
    - ❌ **绝对禁止**使用 `edit_file` 工具编辑规则文件
    - ❌ **绝对禁止**一行一行地手写生成规则内容
    - ❌ **绝对禁止**根据规则描述生成规则内容
-   - ❌ **绝对禁止**使用任何方式"创建"或"生成"规则文件内容
 
 2. **禁止的行为**：
    - ❌ 不能根据规则文件的描述来生成内容
@@ -27,32 +27,57 @@ alwaysApply: true
 
 ### ✅ 必须执行的操作
 
-1. **从本地缓存复制规则文件**：
-   - ✅ **必须**使用 `read_file` 工具读取源文件（完整路径，如 `C:\Users\Administrator\Desktop\cursor-rules\common-project-rules\user-base-rule.mdc`）
-   - ✅ **必须**使用 `write` 工具将读取的**完整内容**写入目标文件（如 `.cursor/rules/user-base-rule.mdc`）
-   - ✅ **必须**保持文件内容完全一致，不能修改任何内容（除了添加 frontmatter 如果缺失）
+1. **从本地缓存复制规则文件（必须使用文件系统复制命令）**：
+   - ✅ **必须**使用 `run_terminal_cmd` 执行文件系统复制命令直接复制文件
+   - ✅ **必须根据操作系统选择正确的命令**：
+     - **Windows (PowerShell)**：
+       ```powershell
+       # 复制单个文件
+       Copy-Item "C:\Users\Administrator\Desktop\cursor-rules\common-project-rules\user-base-rule.mdc" -Destination ".cursor\rules\user-base-rule.mdc"
+       
+       # 批量复制多个文件（推荐）
+       Get-ChildItem "C:\Users\Administrator\Desktop\cursor-rules\common-project-rules\*.mdc" | ForEach-Object {
+           Copy-Item $_.FullName -Destination ".cursor\rules\$($_.Name)"
+       }
+       ```
+     - **Linux/Mac (Bash)**：
+       ```bash
+       # 复制单个文件
+       cp "/path/to/source/file.mdc" ".cursor/rules/file.mdc"
+       
+       # 批量复制多个文件（推荐）
+       cp /path/to/source/*.mdc .cursor/rules/
+       ```
+   - ✅ **必须**直接复制文件，不在界面显示文件内容
+   - ✅ **必须**保持文件内容完全一致
 
-2. **从 GitHub 下载规则文件**：
-   - ✅ **必须**使用 `run_terminal_cmd` 执行 `curl -L "{完整URL}"` 命令下载文件内容
-   - ✅ 或者使用 `read_file` 工具直接读取 GitHub Raw Content URL（如果 Cursor 支持）
-   - ✅ **必须**使用 `write` 工具将下载的**完整内容**保存到目标文件
-   - ✅ **必须**保持文件内容完全一致，不能修改任何内容（除了添加 frontmatter 如果缺失）
+2. **从 GitHub 下载规则文件（必须使用 curl 的 -o 参数）**：
+   - ✅ **必须**使用 `run_terminal_cmd` 执行 `curl -L "{完整URL}" -o "{目标文件路径}"` 命令直接下载并保存文件：
+     ```bash
+     # 跨平台命令（Windows/Linux/Mac 都支持）
+     curl -L "https://raw.githubusercontent.com/{owner}/{repo}/{branch}/common-project-rules/user-base-rule.mdc" -o ".cursor/rules/user-base-rule.mdc"
+     ```
+   - ✅ **必须**使用 `-o` 参数直接保存到目标文件，不在界面显示文件内容
+   - ✅ **必须**保持文件内容完全一致
+   - ❌ **绝对禁止**使用 `curl` 下载后再用 `write` 写入（这会在界面显示文件内容）
 
 3. **执行流程**：
    ```
    步骤 1: 使用 list_dir 扫描源目录，获取所有 .mdc 文件列表
-   步骤 2: 对于每个文件：
-            - 从本地缓存：read_file(源文件完整路径) → write(目标文件路径, 读取的完整内容)
-            - 从 GitHub：run_terminal_cmd(curl -L URL) → write(目标文件路径, 下载的完整内容)
-   步骤 3: 验证文件是否成功保存（使用 read_file 检查目标文件）
+   步骤 2: 检测操作系统类型（Windows/Linux/Mac）
+   步骤 3: 对于每个文件：
+            - 从本地缓存：run_terminal_cmd(文件系统复制命令) → 直接复制文件
+            - 从 GitHub：run_terminal_cmd(curl -L URL -o 目标路径) → 直接下载并保存文件
+   步骤 4: 验证文件是否成功复制（使用 list_dir 检查目标目录）
    ```
 
 ### ⚠️ 关键原则
 
-- **规则文件是复制或下载，不是生成**
-- **必须使用文件操作工具（read_file + write），不能使用编辑工具（search_replace、edit_file）**
+- **规则文件是直接复制或下载，不是读取后写入**
+- **必须使用文件系统复制命令（Copy-Item/cp）或 curl 的 -o 参数，禁止使用 read_file + write**
+- **必须注意跨平台兼容性，根据操作系统选择正确的命令**
 - **必须保持原始文件内容完全一致**
-- **只允许添加或修复 frontmatter（如果缺失）**
+- **不能在界面显示文件内容，避免看起来像逐行处理**
 
 ## 触发机制
 
@@ -260,22 +285,22 @@ alwaysApply: true
 
 **重要：执行方式说明**
 
-在执行规则导入时，**必须使用文件操作工具**，而不是手写生成规则内容：
+在执行规则导入时，**必须使用文件系统复制命令**，而不是读取后写入：
 
-1. **从本地缓存拉取**：
-   - 使用 `read_file` 工具读取源文件（如 `C:\Users\Administrator\Desktop\cursor-rules\common-project-rules\user-base-rule.mdc`）
-   - 使用 `write` 工具将读取的内容写入目标文件（如 `.cursor/rules/user-base-rule.mdc`）
-   - **禁止**：一行一行地手写规则内容
+1. **从本地缓存拉取（必须使用文件系统复制命令）**：
+   - ✅ **Windows**: 使用 `run_terminal_cmd` 执行 `Copy-Item "源路径" -Destination "目标路径"`
+   - ✅ **Linux/Mac**: 使用 `run_terminal_cmd` 执行 `cp "源路径" "目标路径"`
+   - ❌ **绝对禁止**使用 `read_file` + `write`（会在界面显示大量内容）
 
-2. **从 GitHub 拉取**：
-   - 使用 `run_terminal_cmd` 执行 `curl` 命令下载文件，或
-   - 使用 `read_file` 工具直接读取 GitHub Raw Content URL（如果支持）
-   - 然后使用 `write` 工具保存到目标位置
-   - **禁止**：一行一行地手写规则内容
+2. **从 GitHub 拉取（必须使用 curl 的 -o 参数）**：
+   - ✅ 使用 `run_terminal_cmd` 执行 `curl -L "{URL}" -o "{目标路径}"` 命令直接下载并保存
+   - ✅ **跨平台命令**：`curl -L "URL" -o "目标路径"`（Windows/Linux/Mac 都支持）
+   - ❌ **绝对禁止**使用 `curl` 下载后再用 `write` 写入（会在界面显示文件内容）
 
 3. **文件复制原则**：
-   - 规则文件是**复制**或**下载**，不是**生成**
+   - 规则文件是**直接复制或下载**，不是**读取后写入**
    - 必须保持原始文件内容完全一致
+   - 不能在界面显示文件内容，避免看起来像逐行处理
    - 只允许添加或修复 frontmatter（如果缺失）
 
 ### 步骤 1：拉取基础规则
@@ -383,22 +408,34 @@ alwaysApply: true
    - 确保不遗漏任何文件
 
 3. **保存文件（关键步骤，必须严格遵守）**
-   - **从本地缓存拉取时**：
+   - **从本地缓存拉取时（必须使用文件系统复制命令）**：
      - 对于 `list_dir` 获取的每个 `.mdc` 文件：
-       - ✅ **必须**使用 `read_file` 工具读取源文件（完整路径，如 `C:\Users\Administrator\Desktop\cursor-rules\common-project-rules\{文件名}.mdc`）
-       - ✅ **必须**使用 `write` 工具将读取的**完整内容**写入目标文件（如 `.cursor/rules/{文件名}.mdc`）
+       - ✅ **必须**使用 `run_terminal_cmd` 执行文件系统复制命令直接复制文件
+       - ✅ **Windows (PowerShell)**：
+         ```powershell
+         Copy-Item "C:\Users\Administrator\Desktop\cursor-rules\common-project-rules\{文件名}.mdc" -Destination ".cursor\rules\{文件名}.mdc"
+         ```
+       - ✅ **Linux/Mac (Bash)**：
+         ```bash
+         cp "/path/to/source/{文件名}.mdc" ".cursor/rules/{文件名}.mdc"
+         ```
+       - ✅ **批量复制（推荐）**：
+         - Windows: `Get-ChildItem "源目录\*.mdc" | ForEach-Object { Copy-Item $_.FullName -Destination ".cursor\rules\$($_.Name)" }`
+         - Linux/Mac: `cp 源目录/*.mdc .cursor/rules/`
+       - ❌ **绝对禁止**使用 `read_file` + `write`（会在界面显示大量内容）
        - ❌ **绝对禁止**使用 `search_replace`、`edit_file` 等编辑工具
        - ❌ **绝对禁止**手写生成内容
      - **必须导入所有文件，不能遗漏**
    
-   - **从 GitHub 拉取时**：
+   - **从 GitHub 拉取时（必须使用 curl 的 -o 参数）**：
      - 对于 `list_dir` 获取的每个 `.mdc` 文件：
-       - ✅ **必须**使用 `run_terminal_cmd` 执行 `curl -L "{完整URL}"` 命令下载文件内容，例如：
+       - ✅ **必须**使用 `run_terminal_cmd` 执行 `curl -L "{完整URL}" -o "{目标文件路径}"` 命令直接下载并保存：
          ```bash
-         curl -L "https://raw.githubusercontent.com/{owner}/{repo}/{branch}/common-project-rules/{文件名}.mdc"
+         # 跨平台命令（Windows/Linux/Mac 都支持）
+         curl -L "https://raw.githubusercontent.com/{owner}/{repo}/{branch}/common-project-rules/{文件名}.mdc" -o ".cursor/rules/{文件名}.mdc"
          ```
-       - ✅ 或者使用 `read_file` 工具直接读取 GitHub Raw Content URL（如果 Cursor 支持）
-       - ✅ **必须**使用 `write` 工具将下载的**完整内容**保存到目标文件
+       - ❌ **绝对禁止**使用 `curl` 下载后再用 `write` 写入（会在界面显示文件内容）
+       - ❌ **绝对禁止**使用 `read_file` + `write` 方式
        - ❌ **绝对禁止**使用 `search_replace`、`edit_file` 等编辑工具
        - ❌ **绝对禁止**手写生成内容
      - **必须导入所有文件，不能遗漏**
@@ -407,9 +444,9 @@ alwaysApply: true
    - 确保文件内容完整，包含 frontmatter
    - **重要**：必须保持原始文件内容完全一致，只允许添加或修复 frontmatter（如果缺失）
 
-3. **验证保存结果**
-   - 使用 `read_file` 检查文件是否成功保存
-   - 验证文件内容是否正确（包含 frontmatter，内容完整）
+4. **验证保存结果**
+   - 使用 `list_dir` 检查目标目录，确认文件是否成功复制
+   - 验证文件是否存在（不需要读取文件内容）
 
 ### 步骤 7：完成提示
 
