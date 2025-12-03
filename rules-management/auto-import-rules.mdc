@@ -6,23 +6,53 @@ alwaysApply: true
 
 > 定义规则自动导入的完整流程，整合 GitHub 拉取和本地缓存逻辑，支持自动检测和手动触发
 
-## ⚠️ 重要：执行方式要求
+## 🚨 绝对禁止：规则导入执行方式
 
-**AI 在执行规则导入时，必须使用文件操作工具，禁止手写生成规则内容：**
+**AI 在执行规则导入时，必须严格遵守以下要求，违反将导致规则导入失败：**
 
-1. **从本地缓存复制**：
-   - ✅ 使用 `read_file` 读取源文件 → 使用 `write` 写入目标文件
-   - ❌ **禁止**一行一行地手写规则内容
+### ❌ 绝对禁止的操作
 
-2. **从 GitHub 下载**：
-   - ✅ 使用 `run_terminal_cmd` 执行 `curl` 命令下载 → 使用 `write` 保存
-   - ✅ 或使用 `read_file` 直接读取 GitHub Raw URL（如果支持）→ 使用 `write` 保存
-   - ❌ **禁止**一行一行地手写规则内容
+1. **禁止使用任何编辑工具生成规则内容**：
+   - ❌ **绝对禁止**使用 `search_replace` 工具编辑规则文件
+   - ❌ **绝对禁止**使用 `edit_file` 工具编辑规则文件
+   - ❌ **绝对禁止**一行一行地手写生成规则内容
+   - ❌ **绝对禁止**根据规则描述生成规则内容
+   - ❌ **绝对禁止**使用任何方式"创建"或"生成"规则文件内容
 
-3. **原则**：
-   - 规则文件是**复制**或**下载**，不是**生成**
-   - 必须保持原始文件内容完全一致
-   - 只允许添加或修复 frontmatter（如果缺失）
+2. **禁止的行为**：
+   - ❌ 不能根据规则文件的描述来生成内容
+   - ❌ 不能根据规则文件的标题来生成内容
+   - ❌ 不能根据规则文件的目录结构来生成内容
+   - ❌ 不能使用 AI 的知识来"回忆"规则内容
+
+### ✅ 必须执行的操作
+
+1. **从本地缓存复制规则文件**：
+   - ✅ **必须**使用 `read_file` 工具读取源文件（完整路径，如 `C:\Users\Administrator\Desktop\cursor-rules\common-project-rules\user-base-rule.mdc`）
+   - ✅ **必须**使用 `write` 工具将读取的**完整内容**写入目标文件（如 `.cursor/rules/user-base-rule.mdc`）
+   - ✅ **必须**保持文件内容完全一致，不能修改任何内容（除了添加 frontmatter 如果缺失）
+
+2. **从 GitHub 下载规则文件**：
+   - ✅ **必须**使用 `run_terminal_cmd` 执行 `curl -L "{完整URL}"` 命令下载文件内容
+   - ✅ 或者使用 `read_file` 工具直接读取 GitHub Raw Content URL（如果 Cursor 支持）
+   - ✅ **必须**使用 `write` 工具将下载的**完整内容**保存到目标文件
+   - ✅ **必须**保持文件内容完全一致，不能修改任何内容（除了添加 frontmatter 如果缺失）
+
+3. **执行流程**：
+   ```
+   步骤 1: 使用 list_dir 扫描源目录，获取所有 .mdc 文件列表
+   步骤 2: 对于每个文件：
+            - 从本地缓存：read_file(源文件完整路径) → write(目标文件路径, 读取的完整内容)
+            - 从 GitHub：run_terminal_cmd(curl -L URL) → write(目标文件路径, 下载的完整内容)
+   步骤 3: 验证文件是否成功保存（使用 read_file 检查目标文件）
+   ```
+
+### ⚠️ 关键原则
+
+- **规则文件是复制或下载，不是生成**
+- **必须使用文件操作工具（read_file + write），不能使用编辑工具（search_replace、edit_file）**
+- **必须保持原始文件内容完全一致**
+- **只允许添加或修复 frontmatter（如果缺失）**
 
 ## 触发机制
 
@@ -352,23 +382,25 @@ alwaysApply: true
    - 遍历获取到的所有 `.mdc` 文件，逐个导入
    - 确保不遗漏任何文件
 
-3. **保存文件（关键步骤）**
+3. **保存文件（关键步骤，必须严格遵守）**
    - **从本地缓存拉取时**：
      - 对于 `list_dir` 获取的每个 `.mdc` 文件：
-       - 使用 `read_file` 工具读取源文件（如 `C:\Users\Administrator\Desktop\cursor-rules\common-project-rules\{文件名}.mdc`）
-       - 使用 `write` 工具将读取的内容写入目标文件（如 `.cursor/rules/{文件名}.mdc`）
-     - **禁止手写生成内容**
+       - ✅ **必须**使用 `read_file` 工具读取源文件（完整路径，如 `C:\Users\Administrator\Desktop\cursor-rules\common-project-rules\{文件名}.mdc`）
+       - ✅ **必须**使用 `write` 工具将读取的**完整内容**写入目标文件（如 `.cursor/rules/{文件名}.mdc`）
+       - ❌ **绝对禁止**使用 `search_replace`、`edit_file` 等编辑工具
+       - ❌ **绝对禁止**手写生成内容
      - **必须导入所有文件，不能遗漏**
    
    - **从 GitHub 拉取时**：
      - 对于 `list_dir` 获取的每个 `.mdc` 文件：
-       - 使用 `run_terminal_cmd` 执行 `curl` 命令下载文件内容，例如：
+       - ✅ **必须**使用 `run_terminal_cmd` 执行 `curl -L "{完整URL}"` 命令下载文件内容，例如：
          ```bash
          curl -L "https://raw.githubusercontent.com/{owner}/{repo}/{branch}/common-project-rules/{文件名}.mdc"
          ```
-       - 或者使用 `read_file` 工具直接读取 GitHub Raw Content URL（如果 Cursor 支持）
-       - 将获取的内容使用 `write` 工具保存到目标文件
-     - **禁止手写生成内容**
+       - ✅ 或者使用 `read_file` 工具直接读取 GitHub Raw Content URL（如果 Cursor 支持）
+       - ✅ **必须**使用 `write` 工具将下载的**完整内容**保存到目标文件
+       - ❌ **绝对禁止**使用 `search_replace`、`edit_file` 等编辑工具
+       - ❌ **绝对禁止**手写生成内容
      - **必须导入所有文件，不能遗漏**
    
    - 使用确定的文件名
