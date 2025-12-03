@@ -21,12 +21,19 @@ alwaysApply: true
 - **需要拉取的文件**：
   - `user-base-rule.mdc`
   - `git-automation.mdc`
-  - `project-rules-auto-management.mdc`
   - `batch-file-operations.mdc`
+  - `hardware-limitations.mdc`
+  - `documentation-format.mdc`
+  - `ui-design-reconstruction.mdc`
   - 其他 `common-project-rules/` 目录下的 `.mdc` 文件
-- **排除文件**：`github-rules-sync.mdc`（避免循环拉取）
+- **排除目录**：
+  - `rules-management/` - 规则导入/管理类文件，只用于 AI 分析如何导入规则，不导入到用户项目
+  - `optional-project-rules/` - 可选规则，不会自动拉取
 
-**重要说明**：可选规则（`optional-project-rules/` 目录）**不会自动拉取**，需要用户明确要求才拉取。
+**重要说明**：
+- **通用规则（`common-project-rules/`）**：**自动拉取**，所有项目都需要
+- **规则管理文件（`rules-management/`）**：**不拉取到用户项目**，只用于 AI 分析如何导入规则
+- **可选规则（`optional-project-rules/`）**：**不会自动拉取**，需要用户明确要求才拉取
 
 ### 项目规则
 
@@ -100,7 +107,7 @@ alwaysApply: true
 
 ### 步骤 3：确定项目类型
 
-使用 `project-rules-auto-management.mdc` 中的项目类型检测逻辑：
+使用 `rules-management/project-rules-auto-management.mdc` 中的项目类型检测逻辑：
 
 1. **Flutter 混合项目**：
    - 检测条件：存在 `pubspec.yaml` 且存在 `android/` 目录
@@ -135,7 +142,7 @@ alwaysApply: true
 
 #### 4.1 拉取通用规则
 
-对于 `common-project-rules/` 目录下的每个 `.mdc` 文件（排除 `github-rules-sync.mdc`）：
+对于 `common-project-rules/` 目录下的每个 `.mdc` 文件（排除 `rules-management/` 目录）：
 
 1. **构建文件 URL**：
    ```

@@ -277,7 +277,7 @@ alwaysApply: true
 
 ### 本项目规则文件名识别
 
-根据 `project-rules-auto-management.mdc` 中的命名映射规则识别：
+根据 `rules-management/project-rules-auto-management.mdc` 中的命名映射规则识别：
 
 - `flutter-rules.mdc` → 对应规则库中的 `flutter-project.mdc`
 - `android-rules.mdc` → 对应规则库中的 `android-project.mdc`
@@ -290,7 +290,7 @@ alwaysApply: true
 
 - `user-base-rule.mdc` → 对应规则库中的 `common-project-rules/user-base-rule.mdc`
 - `git-automation.mdc` → 对应规则库中的 `common-project-rules/git-automation.mdc`
-- `project-rules-auto-management.mdc` → 对应规则库中的 `common-project-rules/project-rules-auto-management.mdc`
+- `project-rules-auto-management.mdc` → 对应规则库中的 `rules-management/project-rules-auto-management.mdc`（不导入到用户项目）
 - 其他通用规则文件...
 
 ### 用户自定义规则识别

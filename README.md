@@ -60,16 +60,22 @@
 
 #### 通用规则（Common Rules）
 
-位于 `common-project-rules/` 目录，适用于所有项目：
+位于 `common-project-rules/` 目录，适用于所有项目，**自动导入**到用户项目：
 
 - `user-base-rule.mdc` - 用户基础规则（个人偏好、沟通风格等）
 - `git-automation.mdc` - Git 自动化规则
-- `auto-import-rules.mdc` - 规则自动导入规则
 - `ui-design-reconstruction.mdc` - UI 设计图还原规则
-- `project-rules-auto-management.mdc` - 项目规则管理规则
-- `rules-conflict-management.mdc` - 规则冲突管理规则
 - `documentation-format.mdc` - 文档格式规范规则
 - `batch-file-operations.mdc` - 批量文件操作优化规则
+- `hardware-limitations.mdc` - 硬件限制规则
+
+#### 规则管理文件（Rules Management）
+
+位于 `rules-management/` 目录，**不导入到用户项目**，只用于 AI 分析如何导入规则：
+
+- `auto-import-rules.mdc` - 规则自动导入规则
+- `project-rules-auto-management.mdc` - 项目规则管理规则
+- `rules-conflict-management.mdc` - 规则冲突管理规则
 - `github-rules-sync.mdc` - GitHub 同步规则
 
 #### 项目规则（特定规则）
@@ -144,13 +150,17 @@
 ```text
 cursor-rules/
 ├── README.md                          # 项目说明文档（本文件）
-├── common-project-rules/                # 通用规则（适用于所有项目）
+├── common-project-rules/                # 通用规则（适用于所有项目，自动导入）
 │   ├── user-base-rule.mdc             # 用户基础规则
 │   ├── git-automation.mdc             # Git 自动化规则
-│   ├── auto-import-rules.mdc          # 规则自动导入规则
 │   ├── ui-design-reconstruction.mdc   # UI 设计图还原规则
-│   ├── project-rules-auto-management.mdc  # 项目规则管理规则
 │   ├── batch-file-operations.mdc      # 批量文件操作优化规则
+│   ├── hardware-limitations.mdc       # 硬件限制规则
+│   └── documentation-format.mdc       # 文档格式规范规则
+├── rules-management/                    # 规则管理文件（不导入到用户项目）
+│   ├── auto-import-rules.mdc          # 规则自动导入规则
+│   ├── project-rules-auto-management.mdc  # 项目规则管理规则
+│   ├── rules-conflict-management.mdc  # 规则冲突管理规则
 │   └── github-rules-sync.mdc          # GitHub 同步规则
 ├── android-project.mdc                # Android 项目规则
 ├── flutter-project.mdc                # Flutter 项目规则（支持多平台）
@@ -275,8 +285,9 @@ alwaysApply: true
    - 本地不存在时从 GitHub 拉取
 
 5. **规则文件拉取**
-   - 拉取通用规则（`common-project-rules/` 目录）
+   - 拉取通用规则（`common-project-rules/` 目录，自动导入到用户项目）
    - 拉取项目规则（根据项目类型）
+   - **不拉取规则管理文件**（`rules-management/` 目录，只用于 AI 分析如何导入规则）
 
 6. **冲突处理**
    - 未修改的文件：直接更新
@@ -328,7 +339,7 @@ alwaysApply: true
 - 合并规则库的新增和更新内容
 - 生成合并报告供用户确认
 
-详细说明请参考 `rules-conflict-management.mdc` 文件。
+详细说明请参考 `rules-management/rules-conflict-management.mdc` 文件。
 
 ## 🎨 蓝湖 UI 设计图还原规则
 
@@ -472,8 +483,8 @@ alwaysApply: true
 ### 如何添加新的项目类型规则
 
 1. 在根目录创建新的规则文件，如 `react-project.mdc`
-2. 在 `project-rules-auto-management.mdc` 中添加项目类型检测逻辑
-3. 在 `github-rules-sync.mdc` 中添加项目类型映射
+2. 在 `rules-management/project-rules-auto-management.mdc` 中添加项目类型检测逻辑
+3. 在 `rules-management/github-rules-sync.mdc` 中添加项目类型映射
 4. 更新本 README 文档
 
 ### 如何优化现有规则
