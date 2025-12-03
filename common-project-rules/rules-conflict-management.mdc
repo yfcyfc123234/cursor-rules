@@ -286,11 +286,11 @@ alwaysApply: true
 
 ### 通用规则文件名识别
 
-根据规则库中 `common-rules/` 目录下的文件名识别：
+根据规则库中 `common-project-rules/` 目录下的文件名识别：
 
-- `user-base-rule.mdc` → 对应规则库中的 `common-rules/user-base-rule.mdc`
-- `git-automation.mdc` → 对应规则库中的 `common-rules/git-automation.mdc`
-- `project-rules-auto-management.mdc` → 对应规则库中的 `common-rules/project-rules-auto-management.mdc`
+- `user-base-rule.mdc` → 对应规则库中的 `common-project-rules/user-base-rule.mdc`
+- `git-automation.mdc` → 对应规则库中的 `common-project-rules/git-automation.mdc`
+- `project-rules-auto-management.mdc` → 对应规则库中的 `common-project-rules/project-rules-auto-management.mdc`
 - 其他通用规则文件...
 
 ### 用户自定义规则识别

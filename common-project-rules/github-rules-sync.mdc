@@ -17,13 +17,13 @@ alwaysApply: true
 
 ### 通用规则
 
-- **拉取目录**：`common-rules/` 目录下的所有 `.mdc` 文件
+- **拉取目录**：`common-project-rules/` 目录下的所有 `.mdc` 文件
 - **需要拉取的文件**：
   - `user-base-rule.mdc`
   - `git-automation.mdc`
   - `project-rules-auto-management.mdc`
   - `batch-file-operations.mdc`
-  - 其他 `common-rules/` 目录下的 `.mdc` 文件
+  - 其他 `common-project-rules/` 目录下的 `.mdc` 文件
 - **排除文件**：`github-rules-sync.mdc`（避免循环拉取）
 
 **重要说明**：可选规则（`optional-project-rules/` 目录）**不会自动拉取**，需要用户明确要求才拉取。
@@ -135,11 +135,11 @@ alwaysApply: true
 
 #### 4.1 拉取通用规则
 
-对于 `common-rules/` 目录下的每个 `.mdc` 文件（排除 `github-rules-sync.mdc`）：
+对于 `common-project-rules/` 目录下的每个 `.mdc` 文件（排除 `github-rules-sync.mdc`）：
 
 1. **构建文件 URL**：
    ```
-   https://raw.githubusercontent.com/{owner}/{repo}/{branch}/common-rules/{filename}
+   https://raw.githubusercontent.com/{owner}/{repo}/{branch}/common-project-rules/{filename}
    ```
 
 2. **拉取文件内容**：
@@ -214,7 +214,7 @@ alwaysApply: true
    - 保存到本地缓存路径的对应位置
    - 确保本地缓存与 GitHub 仓库同步
    - **如果本地缓存路径不存在**：
-     - 尝试创建目录结构（包括 `common-rules/` 子目录）
+     - 尝试创建目录结构（包括 `common-project-rules/` 子目录）
      - 如果创建失败，记录错误但继续保存到项目
 
 4. **验证保存结果**：
@@ -241,11 +241,11 @@ alwaysApply: true
 
 3. **创建目录结构**：
    - 尝试创建本地缓存根目录（如果不存在）
-   - 尝试创建 `common-rules/` 子目录（如果不存在）
+   - 尝试创建 `common-project-rules/` 子目录（如果不存在）
    - 如果创建失败，记录错误并继续尝试下载
 
 4. **下载规则文件**：
-   - 从默认 GitHub 仓库下载所有通用规则文件到 `common-rules/` 目录
+   - 从默认 GitHub 仓库下载所有通用规则文件到 `common-project-rules/` 目录
    - 下载项目规则文件到根目录
    - 使用 Raw Content URL：`https://raw.githubusercontent.com/yfcyfc123234/cursor-rules/main/`
    - 对于每个文件：
@@ -350,7 +350,7 @@ alwaysApply: true
 
 - **URL 格式**：`https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{path}`
 - **实际 URL**：
-  - 通用规则：`https://raw.githubusercontent.com/yfcyfc123234/cursor-rules/main/common-rules/user-base-rule.mdc`
+  - 通用规则：`https://raw.githubusercontent.com/yfcyfc123234/cursor-rules/main/common-project-rules/user-base-rule.mdc`
   - 项目规则：`https://raw.githubusercontent.com/yfcyfc123234/cursor-rules/main/flutter-project.mdc`
 
 ### HTTP 请求

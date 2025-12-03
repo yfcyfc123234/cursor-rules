@@ -60,7 +60,7 @@
 
 #### 通用规则（Common Rules）
 
-位于 `common-rules/` 目录，适用于所有项目：
+位于 `common-project-rules/` 目录，适用于所有项目：
 
 - `user-base-rule.mdc` - 用户基础规则（个人偏好、沟通风格等）
 - `git-automation.mdc` - Git 自动化规则
@@ -144,7 +144,7 @@
 ```text
 cursor-rules/
 ├── README.md                          # 项目说明文档（本文件）
-├── common-rules/                       # 通用规则（适用于所有项目）
+├── common-project-rules/                # 通用规则（适用于所有项目）
 │   ├── user-base-rule.mdc             # 用户基础规则
 │   ├── git-automation.mdc             # Git 自动化规则
 │   ├── auto-import-rules.mdc          # 规则自动导入规则
@@ -275,7 +275,7 @@ alwaysApply: true
    - 本地不存在时从 GitHub 拉取
 
 5. **规则文件拉取**
-   - 拉取通用规则（`common-rules/` 目录）
+   - 拉取通用规则（`common-project-rules/` 目录）
    - 拉取项目规则（根据项目类型）
 
 6. **冲突处理**

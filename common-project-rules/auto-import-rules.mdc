@@ -195,7 +195,7 @@ alwaysApply: true
 
 ### 步骤 1：拉取通用规则
 
-从 `common-rules/` 目录拉取以下文件（排除 `github-rules-sync.mdc`）：
+从 `common-project-rules/` 目录拉取以下文件（排除 `github-rules-sync.mdc`）：
 
 - `user-base-rule.mdc` - 用户基础规则
 - `git-automation.mdc` - Git 自动化规则
@@ -334,7 +334,7 @@ alwaysApply: true
      - 确定本地缓存路径：
        - 如果用户之前提供了路径（即使不存在），使用该路径
        - 如果用户未提供路径，使用默认路径：`C:\Users\Administrator\Desktop\cursor-rules`
-     - 尝试创建目录结构（包括 `common-rules/` 子目录）
+     - 尝试创建目录结构（包括 `common-project-rules/` 子目录）
      - 从默认 GitHub 仓库下载所有规则文件到本地缓存
   
   2. **下载成功**：

@@ -39,7 +39,7 @@ alwaysApply: true
      - GitHub 仓库：`https://github.com/yfcyfc123234/cursor-rules`
    - **拉取策略**：优先从本地缓存拉取，本地不存在时从 GitHub 拉取
    - **拉取内容**：
-     - 通用规则：从 `common-rules/` 目录拉取（适用于所有项目）
+     - 通用规则：从 `common-project-rules/` 目录拉取（适用于所有项目）
      - 项目规则：根据项目类型匹配对应的 `*-project.mdc` 文件
 
 4. **导入到项目**
@@ -51,9 +51,9 @@ alwaysApply: true
 
 详细的导入流程和规则说明请参考：
 
-- `common-rules/auto-import-rules.mdc` - 完整的规则导入流程
-- `common-rules/project-rules-auto-management.mdc` - 项目类型检测和规则管理
-- `common-rules/github-rules-sync.mdc` - GitHub 同步机制
+- `common-project-rules/auto-import-rules.mdc` - 完整的规则导入流程
+- `common-project-rules/project-rules-auto-management.mdc` - 项目类型检测和规则管理
+- `common-project-rules/github-rules-sync.mdc` - GitHub 同步机制
 
 ## 项目类型检测
 
@@ -152,7 +152,7 @@ AI：无法继续执行规则导入，请解决网络问题后重试
 - **GitHub 仓库**：`https://github.com/yfcyfc123234/cursor-rules`
 - **默认分支**：`main`
 - **本地缓存路径**：`C:\Users\Administrator\Desktop\cursor-rules`
-- **通用规则目录**：`common-rules/`
+- **通用规则目录**：`common-project-rules/`
 - **项目规则目录**：根目录（`*-project.mdc` 文件）
 
 ### 配置检测和用户提示
@@ -177,4 +177,4 @@ AI：无法继续执行规则导入，请解决网络问题后重试
 
 ---
 
-**说明**：此文件用于在 Cursor 中手动配置，作为规则自动导入系统的触发规则。详细的导入流程和规则说明请参考 `common-rules/` 目录下的相关文件。
+**说明**：此文件用于在 Cursor 中手动配置，作为规则自动导入系统的触发规则。详细的导入流程和规则说明请参考 `common-project-rules/` 目录下的相关文件。
